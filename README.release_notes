@@ -1,0 +1,29 @@
+September 21, 2001:
+
+	RRTM_SW is now being officially archived in CVS.  We have
+	reconstructed a history of "release" numbers which will be
+	outlined below.
+
+	Release 1.0 - Direct beam model
+		Reference: "Shortwave and Longwave Enhancements
+		in the Rapid Radiative Transfer Model",
+		E.J. Mlawer and S. A. Clough
+		7th ARM Science Team Conference Proceedings 
+		Published January 1998
+
+	Release 2.0 - DISORT added to RRTM_SW
+		Reference: "Shortwave Clear-Sky Model-Measurement
+		Intercomparison using RRTM"
+		E. J. Mlawer, S. A. Clough, S. Kato
+		8th ARM Science Team Conference Proceedings 
+		Published December 1998		
+
+	Release 2.1 - Aerosols added
+		No reference
+
+	Release 2.2 - Liquid water clouds added using Hu and Stamnes
+		      parameterization
+		No reference
+
+		This version was distributed to Judy Curry, James Pinto,
+		Dana Lane, Brian Soden,	and a Finnish group via our FTP site.
