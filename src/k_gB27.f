@@ -1,12 +1,16 @@
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
       PARAMETER (MG = 16)
       REAL KA(5,13,MG), KB(5,13:59,MG)
 
-      COMMON /HVRSNB/ HVRKG(16:15+NBANDS)
+      COMMON /HVRSN27/ HVRKG27
       COMMON /K27/ KA, KB 
 
-      CHARACTER*8 HVRKG
+      CHARACTER*15 HVRKG27
 
-      DATA HVRKG(27)  / '%I%' /
+      DATA HVRKG27 /'$Revision$'/
 
 C     The array KA contains absorption coefs at the 16 chosen g-values 
 C     for a range of pressure levels > ~100mb and temperatures.  The first
