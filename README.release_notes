@@ -48,3 +48,15 @@ September 21, 2001
 		September 21, 2001, for implementation into the 
 		broadband QME.
 
+October 11, 2001
+
+	Release_2_3 - Cosine response, Delta-M method
+
+	Incorporated ability to calculate fluxes using a instrumental
+	cosine response.  
+	Incorporated ability to output either delta-m or true fluxes.
+	
+	Repaired all revision numbers and output so OUTPUT_RRTM file
+	will have CVS revision numbers.
+		
+
