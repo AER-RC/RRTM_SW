@@ -1180,10 +1180,25 @@ C              Calculation of absorption coefficients due to ice clouds.
      &                    (ASYICE3(INDEX+1,IB) - ASYICE3(INDEX,IB))
                      FDELTA(IB) = FDLICE3(INDEX,IB) + FINT *
      &                    (FDLICE3(INDEX+1,IB) - FDLICE3(INDEX,IB))
+                     if (fdelta(ib) .lt. 0.0) STOP
+     &                    'FDELTA LESS THAN 0.0'
+                     if (fdelta(ib) .gt. 1.0) STOP
+     &                     'FDELTA GT THAN 1.0'                     
                      FORWICE(IB) = FDELTA(IB) + 0.5 / SSACOICE(IB)
 c See Fu 1996 p. 2067 
                      IF (FORWICE(IB) .GT. GICE(IB)) 
      &                     FORWICE(IB) = GICE(IB)
+c Check to ensure all calculated quantities are within physical limits.
+                     if (extcoice(ib) .lt. 0.0) STOP
+     &                    'ICE EXTINCTION LESS THAN 0.0'
+                     if (ssacoice(ib) .gt. 1.0) STOP
+     &                    'ICE SSA GRTR THAN 1.0'
+                     if (ssacoice(ib) .lt. 0.0) STOP
+     &                    'ICE SSA LESS THAN 0.0'
+                     if (gice(ib) .gt. 1.0) STOP
+     &                    'ICE ASYM GRTR THAN 1.0'
+                     if (gice(ib) .lt. 0.0) STOP
+     &                    'ICE ASYM LESS THAN 0.0'
  2300               CONTINUE
                ENDIF
                   
@@ -1199,9 +1214,10 @@ C              Calculation of absorption coefficients due to water clouds.
  2350             CONTINUE
                ELSEIF (LIQFLAG .EQ. 1) THEN
                   RADLIQ = CLDDAT4(LAY)
-                  IF (RADLIQ .LT. 2.5 .OR. RADLIQ .GT. 60.) STOP
+                  IF (RADLIQ .LT. 1.5 .OR. RADLIQ .GT. 60.) STOP
      &                 'LIQUID EFFECTIVE RADIUS OUT OF BOUNDS'
                   INDEX = RADLIQ - 1.5
+                  IF (INDEX .EQ. 0) INDEX = 1
                   IF (INDEX .EQ. 58) INDEX = 57
                   FINT = RADLIQ - 1.5 - INDEX
                   NCBANDS = 29
@@ -1213,6 +1229,17 @@ C              Calculation of absorption coefficients due to water clouds.
                      GLIQ(IB) = ASYLIQ1(INDEX,IB) + FINT *
      &                    (ASYLIQ1(INDEX+1,IB) - ASYLIQ1(INDEX,IB))
                      FORWLIQ(IB) = GLIQ(IB)**NSTR
+c Check to ensure all calculated quantities are within physical limits.
+                     if (extcoliq(ib) .lt. 0.0) STOP
+     &                    'LIQUID EXTINCTION LESS THAN 0.0'
+                     if (ssacoliq(ib) .gt. 1.0) STOP
+     &                    'LIQUID SSA GRTR THAN 1.0'
+                     if (ssacoliq(ib) .lt. 0.0) STOP
+     &                    'LIQUID SSA LESS THAN 0.0'
+                     if (gliq(ib) .gt. 1.0) STOP
+     &                    'LIQUID ASYM GRTR THAN 1.0'
+                     if (gliq(ib) .lt. 0.0) STOP
+     &                    'LIQUID ASYM LESS THAN 0.0'
  2400             CONTINUE
                ENDIF
                
