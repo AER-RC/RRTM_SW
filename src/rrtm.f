@@ -66,15 +66,30 @@ C        level and the heating rate for each layer
      *                   HVDUM1(4),HVRUTL,HVREXT,
      *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
      *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
-      COMMON /HVRSNB/    HVRKG(IB1:IB2)
 
+      COMMON /HVRSN16/   HVRKG16
+      COMMON /HVRSN17/   HVRKG17
+      COMMON /HVRSN18/   HVRKG18
+      COMMON /HVRSN19/   HVRKG19
+      COMMON /HVRSN20/   HVRKG20
+      COMMON /HVRSN21/   HVRKG21
+      COMMON /HVRSN22/   HVRKG22
+      COMMON /HVRSN23/   HVRKG23
+      COMMON /HVRSN24/   HVRKG24
+      COMMON /HVRSN25/   HVRKG25
+      COMMON /HVRSN27/   HVRKG27
+      COMMON /HVRSN28/   HVRKG28
+      COMMON /HVRSN29/   HVRKG29
 
       CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
      *            HVDUM1,HVRUTL,HVREXT,
      *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
      *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRKG
+      CHARACTER*15 HVRKG16,HVRKG17,HVRKG18,HVRKG16,HVRKG19,
+     *             HVRKG20,HVRKG21,HVRKG22,HVRKG23,HVRKG24,
+     *             HVRKG25,HVRKG27,HVRKG28,HVRKG29
+
       CHARACTER PAGE
 
       CHARACTER*50 OUTFORM(7)
@@ -186,12 +201,14 @@ C
  3500    CONTINUE
 C
 C ***    Output module version numbers
-C
+
          WRITE(IWR,9910) HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
      *                   HVRUTL,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR,HVREXT,
-     *                   (HVRKG(NB),NB=16,25),(HVRKG(NB),NB=27,29)
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,
+     *                   HVRCLD,HVRDIS,HVREXT,
+     *                   HVRKG16,HVRKG17,HVRKG18,HVRKG19,
+     *                   HVRKG20,HVRKG21,HVRKG22,HVRKG23,HVRKG24,
+     *                   HVRKG25,HVRKG27,HVRKG28,HVRKG29
 
          CLOSE(IWR)
 
@@ -216,17 +233,14 @@ C
      *       '  taumoldis.f: ',4X,A15,10X,'   util_xx.f: ',6X,A15,/,5X,
      *       '     D1MACH.f: ',4X,A15,10X,'    R1MACH.f: ',6X,A15,/,5X,
      *       '    ErrPack.f: ',4X,A15,10X,'    LINPAK.f: ',6X,A15,/,5X,
-     *       '    aerprop.f: ',4X,A15,10X,'bkdata_aer.f: ',6X,A15,/,5X,
-     *       'nkdata_band.f: ',4X,A15,10X,'cldprop_sw.f: ',6X,A15,/,5X,
-     *       '     disort.f: ',4X,A15,10X,'get_lambda.f: ',6X,A15,/,5X,
-     *       '      param.f: ',4X,A15,10X,'     extra.f: ',6X,A15,/,5X,
-     *                                    '    k_gB16.f: ',4X,A15,/,5X,
-     *       '     k_gB17.f: ',4X,A15,10X,'    k_gB18.f: ',4X,A15,/,5X,
-     *       '     k_gB19.f: ',4X,A15,10X,'    k_gB20.f: ',4X,A15,/,5X,
-     *       '     k_gB21.f: ',4X,A15,10X,'    k_gB22.f: ',4X,A15,/,5X,
-     *       '     k_gB23.f: ',4X,A15,10X,'    k_gB24.f: ',4X,A15,/,5X,
-     *       '     k_gB25.f: ',4X,A15,10X,'    k_gB27.f: ',4X,A15,/,5X,
-     *       '     k_gB28.f: ',4X,A15,10X,'    k_gB29.f: ',4X,A15,/)
+     *       ' cldprop_sw.f: ',4X,A15,10X,'    disort.f: ',6X,A15,/,5X,
+     *       '      extra.f: ',4X,A15,10X,'    k_gB16.f: ',6X,A15,/,5X,
+     *       '     k_gB17.f: ',4X,A15,10X,'    k_gB18.f: ',6X,A15,/,5X,
+     *       '     k_gB19.f: ',4X,A15,10X,'    k_gB20.f: ',6X,A15,/,5X,
+     *       '     k_gB21.f: ',4X,A15,10X,'    k_gB22.f: ',6X,A15,/,5X,
+     *       '     k_gB23.f: ',4X,A15,10X,'    k_gB24.f: ',6X,A15,/,5X,
+     *       '     k_gB25.f: ',4X,A15,10X,'    k_gB27.f: ',6X,A15,/,5X,
+     *       '     k_gB28.f: ',4X,A15,10X,'    k_gB29.f: ',6X,A15,/)
 
       STOP
       END
@@ -740,6 +754,8 @@ c   use Iqbal's equation 1.2.1
 *****************************************************************
       BLOCK DATA
 
+      include 'param.f'
+
       COMMON /HVERSN/ HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
      *                HVDUM1(4),HVRUTL,HVREXT,
      *                HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
@@ -752,7 +768,9 @@ c   use Iqbal's equation 1.2.1
      *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
      *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRKG(16:29)
+
+      COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
+      COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
 
       DATA HVRRTM / 'NOT USED' /,  
      *     HVRRTR / 'NOT USED' /,   HVRATM / 'NOT USED' /,
@@ -761,12 +779,38 @@ c   use Iqbal's equation 1.2.1
      *     HVREXT / 'NOT USED' /, 
      *     HVRD1M / 'NOT USED' /,   HVRR1M / 'NOT USED' /,
      *     HVREPK / 'NOT USED' /,   HVRLPK / 'NOT USED' /,
-     *     HVRAER / 'NOT USED' /,   HVRBKA / 'NOT USED' /,
-     *     HVRBKB / 'NOT USED' /,   HVRCLD / 'NOT USED' /,
+     *     HVRAER / 'NOT USED' /,
+     *     HVRCLD / 'NOT USED' /,
      *     HVRDIS / 'NOT USED' /,   HVRLAM / 'NOT USED' /,
      *     HVRPAR / 'NOT USED' /
 
-      DATA HVRKG /14*'NOT USED' /
+
+      DATA WAVENUM1(16) /2600./,WAVENUM2(16) /3250./,DELWAVE(16) /650./
+      DATA WAVENUM1(17) /3250./,WAVENUM2(17) /4000./,DELWAVE(17) /750./
+      DATA WAVENUM1(18) /4000./,WAVENUM2(18) /4650./,DELWAVE(18) /650./
+      DATA WAVENUM1(19) /4650./,WAVENUM2(19) /5150./,DELWAVE(19) /500./
+      DATA WAVENUM1(20) /5150./,WAVENUM2(20) /6150./,DELWAVE(20) /1000./
+      DATA WAVENUM1(21) /6150./,WAVENUM2(21) /7700./,DELWAVE(21) /1550./
+      DATA WAVENUM1(22) /7700./,WAVENUM2(22) /8050./,DELWAVE(22) /350./
+      DATA WAVENUM1(23) /8050./,WAVENUM2(23)/12850./,DELWAVE(23) /4800./
+      DATA WAVENUM1(24)/12850./,WAVENUM2(24)/16000./,DELWAVE(24) /3150./
+      DATA WAVENUM1(25)/16000./,WAVENUM2(25)/22650./,DELWAVE(25) /6650./
+      DATA WAVENUM1(26)/22650./,WAVENUM2(26)/29000./,DELWAVE(26) /6350./
+      DATA WAVENUM1(27)/29000./,WAVENUM2(27)/38000./,DELWAVE(27) /9000./
+      DATA WAVENUM1(28)/38000./,WAVENUM2(28)/50000./,DELWAVE(28)/12000./
+      DATA WAVENUM1(29)/820./,  WAVENUM2(29)/2600./, DELWAVE(29)/1780./
+
+      DATA NG  /16,16,16,16,16,16,16,16,16,16,16,16,16,16/
+      DATA NSPA /9, 9, 9, 9, 1, 9, 9, 1, 9, 1, 0, 1, 9, 1/
+      DATA NSPB /1, 5, 1, 1, 1, 5, 1, 0, 1, 0, 0, 1, 5, 1/
+
+C     HEATFAC is the factor by which one must multiply delta-flux/ 
+C     delta-pressure, with flux in w/m-2 and pressure in mbar, to get 
+C     the heating rate in units of degrees/day.  It is equal to 
+C           (g)x(#sec/day)x(1e-5)/(specific heat of air at const. p)
+C        =  (9.8066)(3600)(1e-5)/(1.004)
+      DATA HEATFAC /8.4391/
+
 
       END
 
