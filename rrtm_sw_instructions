@@ -352,6 +352,9 @@
  
  
            IMMAX    number of atmospheric profile boundaries
+
+                    If IMMAX is set to a negative value, the level boundaries are
+                    specified in PRESSURE (mbars).
  
             HMOD    24 character description of profile
  
