@@ -1,7 +1,7 @@
-C     path:      /home/rc1/aer_rrtm/SCCS/s.extra.f
-C     revision:  2.3
-C     created:   05 Aug 1996  09:35:31
-C     presently: 23 Oct 1996  11:56:19
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
       SUBROUTINE XSREAD (XV1,XV2)                                         E00010
 C                                                                         E00020
       IMPLICIT DOUBLE PRECISION (V)                                     ! E00030
@@ -38,11 +38,15 @@ C                                                                         E00280
       COMMON /XSECTR/ V1FX(5,35),V2FX(5,35),DVFX(5,35),WXM(35),           E00310
      *                NTEMPF(5,35),NSPECR(35),IXFORM(5,35),               E00320
      *                XSMASS(35),XDOPLR(5,35),NUMXS,IXSBIN                E00325
-      COMMON /HVERSN/    HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*8 HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 C                                                                         E00330
       DIMENSION IXFLG(35)                                                 E00340
 C                                                                         E00350
@@ -57,7 +61,7 @@ C     T296 IS TEMPERATURE FOR INITAL CALCULATIN OF DOPPLER WIDTHS         E00412
 C                                                                         E00413
       DATA T296 / 296.0 /                                                 E00414
 C
-      HVREXT = '2.3'
+      HVREXT = '$Revision$'
 C                                                                         E00420
       IXMAX = 35                                                          E00430
       DO 10 I = 1, IXMAX                                                  E00440

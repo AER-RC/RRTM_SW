@@ -1,7 +1,7 @@
-C     path:      /stormrc1/aer_lblrtm/src/SCCS/s.util_dos.f
-C     revision:  5.2
-C     created:   08/25/98  08:58:21
-C     presently: 07/20/00  07:30:47
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
       SUBROUTINE BUFIN (IFILE,IEOF,IARRAY,IWORDS)                         A10770
 C                                                                         A10780
 C     THIS SUBROUTINE BUFFERS IN (READS) IWORDS INTO  IARRAY STARTING     A10790
@@ -9,17 +9,21 @@ C     AT LOCATION IARRAY                                                  A10800
 C                                                                         A10810
 C     IFILE IS THE FILE DESIGNATION                                       A10820
 C                                                                         A10830
-      COMMON /HVERSN/  HVRLBL,HVRCNT,HVRFFT,HVRATM,HVRLOW,HVRNCG,
-     *                HVROPR,HVRPST,HVRPLT,HVRTST,HVRUTL,HVRXMR
-C
-      CHARACTER*8 HVRLBL,HVRCNT,HVRFFT,HVRATM,HVRLOW,HVRNCG,HVROPR,
-     *            HVRPLT,HVRPST,HVRTST,HVRUTL,HVRXMR
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 C
       DIMENSION IARRAY(IWORDS)                                            A10840
 C
 C     ASSIGN SCCS VERSION NUMBER TO MODULE 
 C
-      HVRUTL = '5.2' 
+      HVRUTL = '$Revision$'
 C                                                                         A10850
       IEOF = 1                                                            A10860
 C                                                                         A10880

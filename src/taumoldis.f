@@ -1,7 +1,7 @@
-C     path:      %P%
-C     revision:  %I%
-C     created:   %G%  %U%
-C     presently: %H%  %T%
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
 *******************************************************************************
 *                                                                             *
 *                  Optical depths developed for the                           *
@@ -150,6 +150,15 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K16/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG)
 
@@ -166,6 +175,7 @@ C     Kurucz
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA, KB
+      HVRTAU = '$Revision$'
       STRRAT1 = 252.131
       LAYREFFR = 18
 
@@ -272,6 +282,15 @@ C  Input
       COMMON /K17/      KA(9,5,13,MG),KB(5,5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(4,MG)
 
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(585,MG),ABSB(1175,MG),SFLUXREF(MG,5)
 
 C     Rayleigh extinction coefficient at v = 3625 cm-1.
@@ -303,6 +322,7 @@ C     Kurucz
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA,KB
+      HVRTAU = '$Revision$'
       STRRAT = 0.364641
       LAYREFFR = 30
 
@@ -430,7 +450,15 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K18/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG,9)
 
 C     Rayleigh extinction coefficient at v = 4325 cm-1.
@@ -478,6 +506,7 @@ C     Kurucz
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA, KB
+      HVRTAU = '$Revision$'
       STRRAT = 38.9589
       LAYREFFR = 6
 
@@ -582,7 +611,15 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K19/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG,9)
 
 C     Rayleigh extinction coefficient at v = 4900 cm-1.
@@ -631,6 +668,7 @@ C     Kurucz
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA, KB
+      HVRTAU = '$Revision$'
       STRRAT = 5.49281
       LAYREFFR = 3
 
@@ -736,7 +774,15 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K20/      KA(5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(4,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(65,MG), ABSB(235,MG), SFLUXREF(MG), ABSCH4(MG)
 
 C     Rayleigh extinction coefficient at v = 5670 cm-1.
@@ -765,6 +811,7 @@ C     lay 1
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA, KB
+      HVRTAU = '$Revision$'
       LAYREFFR = 3
 C     Compute the optical depth by interpolating in ln(pressure), 
 C     temperature, and appropriate species.  Below LAYTROP, the water
@@ -855,7 +902,15 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K21/      KA(9,5,13,MG),KB(5,5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(4,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(585,MG),ABSB(1175,MG),SFLUXREF(MG,9)
 
 C     Rayleigh extinction coefficient at v = 6925 cm-1.
@@ -903,6 +958,7 @@ C     Kurucz
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA,KB
+      HVRTAU = '$Revision$'
       STRRAT = 0.0045321
       LAYREFFR = 8
 
@@ -1030,7 +1086,15 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K22/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG,9)
 
 C     Rayleigh extinction coefficient at v = 8000 cm-1.
@@ -1077,6 +1141,7 @@ C     Kurucz
      &     5.31792E-02, 3.44955E-02, 1.30189E-02, 1.84551E-03/
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
       REAL KA, KB
+      HVRTAU = '$Revision$'
       STRRAT = 0.022708
       LAYREFFR = 2
 C     The following factor is the ratio of total O2 band intensity (lines 
@@ -1189,7 +1254,15 @@ C  Input
       COMMON /SELF/     SELFFAC(MXLAY), SELFFRAC(MXLAY), INDSELF(MXLAY)
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K23/      KA(5,13,MG),SELFREF(10,MG),FORREF(3,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(65,MG), SFLUXREF(MG), RAYL(MG)
 
       DATA RAYL/
@@ -1206,6 +1279,7 @@ C     Kurucz
  
       EQUIVALENCE (KA,ABSA)
       REAL KA
+      HVRTAU = '$Revision$'
       LAYREFFR = 6
 C     Average Giver et al. correction factor for this band.
       GIVFAC = 1.029
@@ -1283,7 +1357,15 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K24/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG,9)
       DIMENSION ABSO3A(MG), ABSO3B(MG), RAYLA(MG,9), RAYLB(MG)
 
@@ -1383,6 +1465,7 @@ C     Kurucz
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA, KB
+      HVRTAU = '$Revision$'
       STRRAT = 0.124692
       LAYREFFR = 1
 
@@ -1488,7 +1571,15 @@ C  Input
      &                  FAC10(MXLAY),FAC11(MXLAY)                             
       COMMON /INTIND/   JP(MXLAY),JT(MXLAY),JT1(MXLAY)
       COMMON /K25/      KA(5,13,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(65,MG), SFLUXREF(MG),RAYL(MG)
       DIMENSION ABSO3A(MG), ABSO3B(MG)
 
@@ -1518,6 +1609,7 @@ c     Kurucz
       EQUIVALENCE (KA,ABSA)
 
       REAL KA
+      HVRTAU = '$Revision$'
       LAYREFFR = 2
 
 C     Compute the optical depth by interpolating in ln(pressure), 
@@ -1601,7 +1693,8 @@ c     &     129.462, 15*0.0/
      &     11.8619,9.95840,6.68696,5.38987,
      &     3.49829,0.407693,0.299027,0.236827,
      &     0.188502,0.163489,4.64335E-02,2.72662E-03/
- 
+
+      HVRTAU = '$Revision$' 
 C     Compute the optical depth by interpolating in ln(pressure), 
 C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
@@ -1687,6 +1780,7 @@ C     lay 32
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA, KB
+      HVRTAU = '$Revision$'
       LAYREFFR = 59
       SCALEKUR = 50.15/48.37
 
@@ -1763,7 +1857,15 @@ C  Input
       COMMON /SELF/     SELFFAC(MXLAY), SELFFRAC(MXLAY), INDSELF(MXLAY)
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K28/      KA(9,5,13,MG),KB(5,5,13:59,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(585,MG), ABSB(1175,MG), SFLUXREF(MG,5)
       data rayl /2.02e-5/
       DATA SFLUXREF/
@@ -1790,6 +1892,7 @@ C     Kurucz
      &     1.44818E-02, 1.01048E-02, 4.97487E-03, 5.66831E-04/
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
       REAL KA, KB
+      HVRTAU = '$Revision$'
       STRRAT = 6.67029E-7
       LAYREFFR = 58
 C     Compute the optical depth by interpolating in ln(pressure), 
@@ -1903,7 +2006,15 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K29/      KA(5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(4,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       DIMENSION ABSA(65,MG), ABSB(235,MG), SFLUXREF(MG)
       DIMENSION ABSH2O(MG), ABSCO2(MG)
 
@@ -1934,6 +2045,7 @@ c     &     4.06913E-02, 2.85699E-02, 1.14927E-02, 1.65473E-03/
       EQUIVALENCE (KA,ABSA),(KB,ABSB)
 
       REAL KA, KB
+      HVRTAU = '$Revision$'
       LAYREFFR = 49
 C     Compute the optical depth by interpolating in ln(pressure), 
 C     temperature, and appropriate species.  Below LAYTROP, the water

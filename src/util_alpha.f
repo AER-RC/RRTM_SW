@@ -1,7 +1,7 @@
-C     path:      /stormrc1/aer_lblrtm/src/SCCS/s.util_alpha.f
-C     revision:  5.3
-C     created:   10/27/99  16:35:59
-C     presently: 07/20/00  07:30:46
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
 C     --------------------------------------------------------------
       SUBROUTINE BUFIN (IFILE,IEOF,IARRAY,IWORDS)
 C
@@ -10,17 +10,21 @@ C     AT LOCATION IARRAY
 C
 C     IFILE IS THE FILE DESIGNATION
 C                                                                         A10830
-      COMMON /HVERSN/  HVRLBL,HVRCNT,HVRFFT,HVRATM,HVRLOW,HVRNCG,
-     *                HVROPR,HVRPST,HVRPLT,HVRTST,HVRUTL,HVRXMR
-C
-      CHARACTER*8 HVRLBL,HVRCNT,HVRFFT,HVRATM,HVRLOW,HVRNCG,HVROPR,
-     *            HVRPLT,HVRPST,HVRTST,HVRUTL,HVRXMR
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 C                                  
       DIMENSION IARRAY(IWORDS)
 C
 C     ASSIGN SCCS VERSION NUMBER TO MODULE 
 C
-      HVRUTL = '5.3' 
+      HVRUTL = '$Revision$'
 C                          
       IEOF = 1             
 C                          
