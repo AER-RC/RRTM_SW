@@ -158,9 +158,20 @@ C ***    Process output for this atmosphere.
             ISTART = IB2
          ENDIF
 
-         if (isccos .eq. 1) write(iwr,9880) 
-         if (isccos .eq. 2) write(iwr,9881) 
-         if (idelm .ne. 0) write(iwr,9882) 
+         if (isccos .eq. 1) then 
+            write(iwr,9880) 
+         elseif (isccos .eq. 2) then
+            write(iwr,9881)
+         else
+            write(iwr,9879)
+         endif
+
+         if (idelm .eq. 0) then
+            write(iwr,9883)
+         else
+            write(iwr,9882)
+         endif
+
          WRITE(IWR,9899)WAVENUM1(ISTART),WAVENUM2(IEND)
          WRITE(IWR,9900)
          WRITE(IWR,9901)
@@ -214,12 +225,16 @@ C ***    Output module version numbers
 
  4000 CONTINUE
 
+ 9879 format(1x)
  9880 format(1x,'All output fluxes have been adjusted to account for ins
      &trumental cosine response.') 
  9881 format(1x,'The output diffuse fluxes have been adjusted to account
      & for instrumental cosine response.') 
+
  9882 format(1x,'The downwelling direct and diffuse fluxes have been com
      &puted using the delta-M scaling approximation.') 
+ 9883 format(1x)
+
  9899 FORMAT(1X,'Wavenumbers: ',F6.0,' - ',F6.0,' cm-1')
  9900 FORMAT(1X,'LEVEL PRESSURE   UPWARD FLUX   DIFDOWN FLUX  DIRDOWN FL  
      &UX  DOWNWARD FLUX   NET FLUX    HEATING RATE')
