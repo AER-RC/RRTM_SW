@@ -4,19 +4,20 @@ C     revision:  $Revision$
 C     created:   $Date$
 ****************************************************************************
 *                                                                          *
-*                               RRTM                                       *
+*                               RRTM_SW                                    *
 *                                                                          *
 *                                                                          *
 *                                                                          *
 *                   A RAPID RADIATIVE TRANSFER MODEL                       *
-*                                                                          *
+*                    FOR THE SOLAR SPECTRAL REGION                         *
 *                                                                          *
 *            ATMOSPHERIC AND ENVIRONMENTAL RESEARCH, INC.                  *
 *                        840 MEMORIAL DRIVE                                *
 *                        CAMBRIDGE, MA 02139                               *
 *                                                                          *
 *                                                                          *
-*                           ELI J. MLAWER                                  *
+*                           ELI J. MLAWER                                  *   
+*                         JENNIFER DELAMERE                                *
 *                         STEVEN J. TAUBMAN~                               *
 *                         SHEPARD A. CLOUGH                                *
 *                                                                          *
@@ -33,9 +34,9 @@ C     created:   $Date$
 *                                                                          *
 ****************************************************************************
 
-       PROGRAM RRTM
+       PROGRAM RRTM_SW
                     
-C *** This program is the driver for RRTM, the AER rapid model.  
+C *** This program is the driver for RRTM_SW, the AER rapid model.  
 C     For each atmosphere the user wishes to analyze, this routine
 C     a) calls READPROF to read in the atmospheric profile
 C     b) calls SETCOEF to calculate various quantities needed for 
@@ -47,7 +48,9 @@ C        level and the heating rate for each layer
 
       INCLUDE 	'param.f'
 
-      COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
+      COMMON /CONSTANTS/ FLUXFAC,HEATFAC
+      COMMON /CONSTS/ PI,PLANCK,BOLTZ,CLIGHT,AVOGAD,ALOSMT,GASCON,
+     *                RADCN1,RADCN2 
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
       COMMON /PRECISE/   ONEMINUS
       COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
@@ -58,7 +61,7 @@ C        level and the heating rate for each layer
      &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
       COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),
      &     TAUCLOUD(MXLAY,NBANDS),SSACLOUD(MXLAY,NBANDS),
-     &     xmom(0:16,MXLAY,NBANDS)
+     &     xmom(0:16,MXLAY,NBANDS),taucldorig(mxlay,nbands)
       COMMON /OUTPUT/    TOTUFLUX(0:MXLAY), TOTDFLUX(0:MXLAY),
      &                   DIFDOWNFLUX(0:MXLAY), DIRDOWNFLUX(0:MXLAY),
      &                   FNET(0:MXLAY), HTR(0:MXLAY)
@@ -86,7 +89,7 @@ C        level and the heating rate for each layer
      *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
      *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRKG16,HVRKG17,HVRKG18,HVRKG16,HVRKG19,
+      CHARACTER*15 HVRKG16,HVRKG17,HVRKG18,HVRKG19,
      *             HVRKG20,HVRKG21,HVRKG22,HVRKG23,HVRKG24,
      *             HVRKG25,HVRKG27,HVRKG28,HVRKG29
 
@@ -110,7 +113,7 @@ c     Setup format statements for output
       IDIS = 1
 
       ONEMINUS = 1. - 1.E-6
-      PI = 2.*ASIN(1.)
+c      PI = 2.*ASIN(1.)
       FLUXFAC = PI * 2.D4  
 
       IWR = 10
@@ -141,7 +144,7 @@ C ***    Calculate information needed by the radiative transfer routine
 C        that is specific to this atmosphere, especially some of the 
 C        coefficients and indices needed to compute the optical depths
 C        by interpolating data from stored reference atmospheres. 
-
+         ICLDATM = 0
          IF (ICLD .EQ. 1) CALL CLDPROP_SW(ICLDATM)
 
          CALL SETCOEF
@@ -277,7 +280,9 @@ C      PARAMETER (MAXPROD = MXLAY*MAXXSEC)
 
       COMMON /CONTROL/  IAER, NSTR, IOUT, ISTART, IEND, ICLD,
      &                  idelm, isccos
-      COMMON /CONSTANTS/PI,FLUXFAC,HEATFAC
+      COMMON /CONSTANTS/FLUXFAC,HEATFAC
+      COMMON /CONSTS/ PI,PLANCK,BOLTZ,CLIGHT,AVOGAD,ALOSMT,GASCON,
+     *                RADCN1,RADCN2 
       COMMON /SWPROP/   ZENITH, ALBEDO, ADJFLUX
       COMMON /SURFACE/  IREFLECT,SEMISS(NBANDS)
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
@@ -331,13 +336,11 @@ C  Initialize molecular amount and cross section arrays to zero here.
 C     No cross-sections implemented in shortwave.
       IXSECT = 0
 
-C     If clouds are present, read in appropriate input file, IN_CLD_RRTM.
-      IF (ICLD .EQ. 1) CALL READCLD
-
-      IF (ISCAT .NE. O) THEN
+      IF (ISCAT .NE. 0) THEN
          PRINT *,' INVALID SCATTERING OPTION CHOSEN'
          STOP
       ENDIF
+
       IF (ISTRM .EQ. 0) THEN 
          NSTR = 4
       ELSE IF  (ISTRM .EQ. 1) THEN
@@ -350,6 +353,10 @@ C     If clouds are present, read in appropriate input file, IN_CLD_RRTM.
       ENDIF
 
       IF (IAER.EQ.10) CALL READAER
+
+C     If clouds are present, read in appropriate input file, IN_CLD_RRTM.
+      IF (ICLD .EQ. 1) CALL READCLD
+
 
       READ (IRD,9020) JULDAT, SZA
       ZENITH = COS(SZA * PI / 180.)
@@ -485,11 +492,13 @@ C     Purpose:  To read in IN_CLD_RRTM_SW, the file that contains input
 C               cloud properties.
 
       INCLUDE 	'param.f'
-
+      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
+     &                   idelm, isccos
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
       COMMON /CLOUDIN/   INFLAG,CLDDAT1(MXLAY),CLDDAT2(MXLAY),
-     &                   ICEFLAG,LIQFLAG,CLDDAT3(MXLAY),CLDDAT4(MXLAY)
+     &                   ICEFLAG,LIQFLAG,CLDDAT3(MXLAY),CLDDAT4(MXLAY),
+     &                   CLDDATMOM(0:16,MXLAY)
       COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),
      &     TAUCLOUD(MXLAY,NBANDS),SSACLOUD(MXLAY,NBANDS),
      &     xmom(0:16,MXLAY,NBANDS)
@@ -507,25 +516,41 @@ C     Read in cloud input option.
          CLDFRAC(LAY) = 0.
  500  CONTINUE
 
- 1000 CONTINUE
-C     For INFLAG = 0 or 1, for each cloudy layer only LAY, FRAC, and
-C     DAT1 are pertinent.  If CTEST = '%', then there are no more 
+      IF (INFLAG .EQ. 0) THEN
+ 950     CONTINUE
+c     For INFLAG = 0 or 1, for each cloudy layer only LAY, FRAC, and
+c     DAT1 are pertinent.  If CTEST = '%', then there are no more 
 C     cloudy layers to process.
-      READ (IRDCLD,9100,END=9000) CTEST,LAY,FRAC,DAT1,DAT2,DAT3,DAT4
-      IF (CTEST .EQ. CPERCENT) GO TO 9000
-      CLDFRAC(LAY) = FRAC
-      CLDDAT1(LAY) = DAT1
-      CLDDAT2(LAY) = DAT2
-      CLDDAT3(LAY) = DAT3
-      CLDDAT4(LAY) = DAT4
-      GO TO 1000
+         READ (IRDCLD,9099,END=8950) CTEST,LAY,FRAC,
+     &        DAT1,DAT2,(CLDDATMOM(ISTR,LAY),ISTR=0,NSTR)
+         IF (CTEST .EQ. CPERCENT) GO TO 8950
+         CLDFRAC(LAY) = FRAC
+         CLDDAT1(LAY) = DAT1
+         CLDDAT2(LAY) = DAT2
+         GO TO 950
+ 8950    CONTINUE
+      ELSE
+ 1000    CONTINUE
+c     For INFLAG = 0 or 1, for each cloudy layer only LAY, FRAC, and
+c     DAT1 are pertinent.  If CTEST = '%', then there are no more 
+C     cloudy layers to process.
+         READ (IRDCLD,9100,END=9000) CTEST,LAY,FRAC,
+     &        DAT1,DAT2,DAT3,DAT4
+         IF (CTEST .EQ. CPERCENT) GO TO 9000
+         CLDFRAC(LAY) = FRAC
+         CLDDAT1(LAY) = DAT1
+         CLDDAT2(LAY) = DAT2
+         CLDDAT3(LAY) = DAT3
+         CLDDAT4(LAY) = DAT4
+         GO TO 1000
+ 9000    CONTINUE
+      ENDIF
 
- 9000 CONTINUE
       CLOSE(IRDCLD)
 
  9050 FORMAT (3X,I2,4X,I1,4X,I1)
+ 9099 FORMAT (A1,1X,I3,19E10.5)
  9100 FORMAT (A1,1X,I3,5E10.5)
-
       RETURN
       END
 
@@ -784,7 +809,7 @@ c   use Iqbal's equation 1.2.1
      *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
 
-      COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
+      COMMON /CONSTANTS/ FLUXFAC,HEATFAC
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
 
       DATA HVRRTM / 'NOT USED' /,  
@@ -828,4 +853,30 @@ C        =  (9.8066)(3600)(1e-5)/(1.004)
 
 
       END
+c**********************************************************************
+      Block Data phys_consts
+c
+      COMMON /CONSTS/ PI,PLANCK,BOLTZ,CLIGHT,AVOGAD,ALOSMT,GASCON,
+     *                RADCN1,RADCN2 
+c
+      DATA PI / 3.1415927410125732 /
+c
+c    Constants from NIST 01/11/2002
+c
+      DATA PLANCK / 6.62606876E-27 /, BOLTZ  / 1.3806503E-16 /,
+     *     CLIGHT / 2.99792458E+10 /, 
+     *     AVOGAD / 6.02214199E+23 /, ALOSMT / 2.6867775E+19 /,
+     *     GASCON / 8.314472  E+07 /
+     *     RADCN1 / 1.191042722E-12 /, RADCN2 / 1.4387752    /
+c
+c     Pi was obtained from   PI = 2.*ASIN(1.)                             A03980
+c
+c     units are genrally cgs
+c
+c     The first and second radiation constants are taken from NIST.
+c     They were previously obtained from the relations:
+c                            RADCN1 = 2.*PLANCK*CLIGHT*CLIGHT*1.E-07      A03990
+c                            RADCN2 = PLANCK*CLIGHT/BOLTZ                 A04000
+      end
+c
 
