@@ -525,15 +525,19 @@ c           Set defaults to get standard Angstrom relation.
             if (aerpar(2) .lt. eps) aerpar(2) = 1.
 
             omaer  = 1. - aerpar(1)
-            factor = 1. / omaer
             do ib = ib1, ib2
                if (omaer .ne. 0.) then
+                  factor = 1. / omaer
                   aodbar = factor *(rl2(ib)**omaer - rl1(ib)**omaer)/ 
      &                 (rl2(ib) - rl1(ib))
                else
                   aodbar = alog(rl2(ib)/rl1(ib))/(rl2(ib) - rl1(ib))
                endif
-               rlambda(ib) = (1. / aodbar) ** (1./ aerpar(1))
+               if (aerpar(1) .ne. 0.) then
+                  rlambda(ib) = (1. / aodbar) ** (1./ aerpar(1))
+               else
+                  rlambda(ib) = 1.0
+               endif
                specfac(ib) = (aerpar(2) + aerpar(3) * rlambda(ib)) /
      &              ((aerpar(2) + aerpar(3) - 1.) + 
      &              rlambda(ib)**aerpar(1))
