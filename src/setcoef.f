@@ -6,8 +6,6 @@ C     created:   $Date$
 
 C     Purpose:  For a given atmosphere, calculate the indices and
 C     fractions related to the pressure and temperature interpolations.
-C     Also calculate the values of the integrated Planck functions 
-C     for each band at the level and layer temperatures.
 
       PARAMETER (MXLAY = 203)
       PARAMETER (MG =16)
@@ -201,23 +199,15 @@ C        foreign-continuum in the calculation of absorption coefficient.
          FACTOR = (TAVEL(LAY)-188.0)/36.0
          INDFOR(LAY) = 3
          FORFRAC(LAY) = FACTOR - 1.0
-c         forfac(lay) = 0.
 C
 C        Calculate needed column amounts.
-        COLH2O(LAY) = 1.E-20 * WKL(1,LAY)
+         COLH2O(LAY) = 1.E-20 * WKL(1,LAY)
          COLCO2(LAY) = 1.E-20 * WKL(2,LAY)
          COLO3(LAY) = 1.E-20 * WKL(3,LAY)
-c         COLO3(LAY) = colo3(lay)/1.16
          COLN2O(LAY) = 1.E-20 * WKL(4,LAY)
          COLCH4(LAY) = 1.E-20 * WKL(6,LAY)
          COLO2(LAY) = 1.E-20 * WKL(7,LAY)
          COLMOL(LAY) = 1.E-20 * COLDRY(LAY) + COLH2O(LAY)
-c         colco2(lay) = 0.
-c         colo3(lay) = 0.
-c         coln2o(lay) = 0.
-c         colch4(lay) = 0.
-c         colo2(lay) = 0.
-c         colmol(lay) = 0.
          IF (COLCO2(LAY) .EQ. 0.) COLCO2(LAY) = 1.E-32 * COLDRY(LAY)
          IF (COLN2O(LAY) .EQ. 0.) COLN2O(LAY) = 1.E-32 * COLDRY(LAY)
          IF (COLCH4(LAY) .EQ. 0.) COLCH4(LAY) = 1.E-32 * COLDRY(LAY)
