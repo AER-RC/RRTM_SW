@@ -1,4 +1,6 @@
-
+C     path:      $Source$
+C     revision:  $Revision$
+C     created:   $Date$
       SUBROUTINE SGBCO( ABD, LDA, N, ML, MU, IPVT, RCOND, Z )
 
 c         Factors a real band matrix by Gaussian elimination
@@ -1115,7 +1117,17 @@ c     .. External Subroutines ..
       EXTERNAL  SAXPY
 c     ..
 
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      HVRLPK = '$Revision$'
       NM1  = N - 1
 
       IF( JOB.EQ.0 ) THEN
