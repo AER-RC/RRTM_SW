@@ -552,7 +552,7 @@ C----------------------------------------------------------------------------
 
       SUBROUTINE TAUGB19
 
-C     BAND 18:  4650-5150 cm-1 (low - H2O,CO2; high - CO2)
+C     BAND 19:  4650-5150 cm-1 (low - H2O,CO2; high - CO2)
 
       PARAMETER (MG=16, MXLAY=203, NBANDS=14)
 
@@ -1079,17 +1079,24 @@ C     Kurucz
       REAL KA, KB
       STRRAT = 0.022708
       LAYREFFR = 2
+C     The following factor is the ratio of total O2 band intensity (lines 
+C     and Mate continuum) to O2 band intensity (line only).  It is needed
+C     to adjust the optical depths since the k's include only lines.
+      O2ADJ = 1.6
 C     Compute the optical depth by interpolating in ln(pressure), 
 C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
       LAYSOLFR = LAYTROP
+
       DO 2500 LAY = 1, LAYTROP
          IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
      &        LAYSOLFR = LAY
-         SPECCOMB = COLH2O(LAY) + STRRAT*COLO2(LAY)
+         O2CONT = 4.35e-4*colo2(lay)/(350.0*2.0)
+         SPECCOMB = COLH2O(LAY) + O2ADJ*STRRAT*COLO2(LAY)
          SPECPARM = COLH2O(LAY)/SPECCOMB 
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS
          SPECMULT = 8.*(SPECPARM)
+c         ODADJ = SPECPARM + O2ADJ * (1. - SPECPARM)
          JS = 1 + INT(SPECMULT)
          FS = AMOD(SPECMULT,1.0)
          FAC000 = (1. - FS) * FAC00(LAY)
@@ -1123,6 +1130,7 @@ C     vapor self-continuum is interpolated (in temperature) separately.
      &           FORFAC(LAY) * (FORREF(INDF,IG) + 
      &           FORFRAC(LAY) *
      &           (FORREF(INDF+1,IG) - FORREF(INDF,IG))))
+     &           + O2CONT
             SSA(LAY,IG) = TAURAY/TAUG(LAY,IG)
             IF (LAY .EQ. LAYSOLFR) SFLUXZEN(IG) = SFLUXREF(IG,JS) 
      &           + FS * (SFLUXREF(IG,JS+1) - SFLUXREF(IG,JS))
@@ -1130,16 +1138,18 @@ C     vapor self-continuum is interpolated (in temperature) separately.
  2500 CONTINUE
 
       DO 3500 LAY = LAYTROP+1, NLAYERS
+         O2CONT = 4.35e-4*colo2(lay)/(350.0*2.0)
          IND0 = ((JP(LAY)-13)*5+(JT(LAY)-1))*NSPB(22) + 1
          IND1 = ((JP(LAY)-12)*5+(JT1(LAY)-1))*NSPB(22) + 1
          TAURAY = COLMOL(LAY) * RAYL
          DO 3000 IG = 1, NG(22)
-            TAUG(LAY,IG) = COLO2(LAY) *
+            TAUG(LAY,IG) = COLO2(LAY) * O2ADJ *
      &          (FAC00(LAY) * ABSB(IND0,IG) +
      &           FAC10(LAY) * ABSB(IND0+1,IG) +
      &           FAC01(LAY) * ABSB(IND1,IG) + 
      &           FAC11(LAY) * ABSB(IND1+1,IG)) +
      &           TAURAY
+     &           + O2CONT
             SSA(LAY,IG) = TAURAY/TAUG(LAY,IG)
  3000    CONTINUE
  3500 CONTINUE
@@ -1197,6 +1207,8 @@ C     Kurucz
       EQUIVALENCE (KA,ABSA)
       REAL KA
       LAYREFFR = 6
+C     Average Giver et al. correction factor for this band.
+      GIVFAC = 1.029
 
 C     Compute the optical depth by interpolating in ln(pressure), 
 C     temperature, and appropriate species.  Below LAYTROP, the water
@@ -1212,7 +1224,7 @@ C     vapor self-continuum is interpolated (in temperature) separately.
          DO 2000 IG = 1, NG(23)
             TAURAY = COLMOL(LAY) * RAYL(IG)
             TAUG(LAY,IG) = COLH2O(LAY) * 
-     &          ((FAC00(LAY) * ABSA(IND0,IG) +
+     &          (GIVFAC * (FAC00(LAY) * ABSA(IND0,IG) +
      &           FAC10(LAY) * ABSA(IND0+1,IG) +
      &           FAC01(LAY) * ABSA(IND1,IG) +
      &           FAC11(LAY) * ABSA(IND1+1,IG)) +
@@ -1526,6 +1538,7 @@ C     vapor self-continuum is interpolated (in temperature) separately.
      &           FAC11(LAY) * ABSA(IND1+1,IG)) +
      &           COLO3(LAY) * ABSO3A(IG) +
      &           TAURAY
+c            print*,'TAUMOL',lay,ig,tauray,taug(lay,ig)-tauray
             SSA(LAY,IG) = TAURAY/TAUG(LAY,IG)
             IF (LAY .EQ. LAYSOLFR) SFLUXZEN(IG) = SFLUXREF(IG) 
  2000    CONTINUE
@@ -1615,7 +1628,7 @@ C----------------------------------------------------------------------------
 
       SUBROUTINE TAUGB27
 
-C     BAND 20:  29000-38000 cm-1 (low - O3; high - O3)
+C     BAND 27:  29000-38000 cm-1 (low - O3; high - O3)
 
       PARAMETER (MG=16, MXLAY=203, NBANDS=14)
 
@@ -1654,6 +1667,11 @@ C  Input
      &     9.58324E-06,9.81542E-06,9.75119E-06,9.74533E-06,
      &     9.74139E-06,9.73525E-06,9.73577E-06,9.73618E-06/
       DATA SFLUXREF/
+C     The following values were obtained using the "low resolution"
+C     version of the Kurucz solar source function.  For unknown reasons,
+C     the total irradiance in this band differs from the corresponding
+C     total in the "high-resolution" version of the Kurucz function.
+C     Therefore, below these values are scaled by the factor SCALEKUR.
 C     Kurucz
 C     lay = 59
 c     &     14.1631, 11.4242, 8.67447, 5.55706,
@@ -1670,6 +1688,7 @@ C     lay 32
 
       REAL KA, KB
       LAYREFFR = 59
+      SCALEKUR = 50.15/48.37
 
 C     Compute the optical depth by interpolating in ln(pressure), 
 C     temperature, and appropriate species.  Below LAYTROP, the water
@@ -1704,7 +1723,7 @@ C     vapor self-continuum is interpolated (in temperature) separately.
      &           FAC11(LAY) * ABSB(IND1+1,IG)) +
      &           TAURAY
             SSA(LAY,IG) = TAURAY/TAUG(LAY,IG)
-            IF (LAY .EQ. LAYSOLFR) SFLUXZEN(IG) = SFLUXREF(IG) 
+            IF (LAY.EQ.LAYSOLFR) SFLUXZEN(IG) = SCALEKUR * SFLUXREF(IG) 
  3000    CONTINUE
  3500 CONTINUE
 
