@@ -1,3 +1,6 @@
+C     path:      $Source$
+C     revision:  $Revision$
+C     created:   $Date$
       SUBROUTINE  ErrMsg( MESSAG, FATAL )
 
 c        Print out a warning or error message;  abort if error
@@ -8,7 +11,17 @@ c        after making symbolic dump (machine-specific)
       INTEGER       MaxMsg, NumMsg
       SAVE          MaxMsg, NumMsg, MsgLim
       DATA NumMsg / 0 /,  MaxMsg / 100 /,  MsgLim / .FALSE. /
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      HVREPK = '$Revision$'
 
       IF ( FATAL )  THEN
          WRITE ( *, '(//,2A,//)' )  ' ******* ERROR >>>>>>  ', MESSAG

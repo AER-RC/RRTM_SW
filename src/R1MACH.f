@@ -1,3 +1,6 @@
+C     path:      $Source$
+C     revision:  $Revision$
+C     created:   $Date$
       REAL FUNCTION R1MACH(I)
 
 c        Single-precision machine constants
@@ -185,7 +188,17 @@ c VAX/VMS VERSION 2.2.
 c      DATA RMACH/'80'X,'FFFF7FFF'X,'3480'X,'3500'X,
 c     $ '209B3F9A'X/, SC/987/
 
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      HVRR1M = '$Revision$'
       IF( PASS1 )  THEN
 
          PASS1 = .FALSE.

@@ -1,3 +1,6 @@
+C     path:      $Source$
+C     revision:  $Revision$
+C     created:   $Date$
       DOUBLE PRECISION FUNCTION D1MACH(I)
 
 c  Double-precision machine constants (see R1MACH for documentation)
@@ -225,8 +228,17 @@ c      DATA (SMALL(N),N=1,2)/'80'X,'0'X/,
 c     $  (LARGE(N),N=1,2)/'FFFF7FFF'X,'FFFFFFFF'X/,
 c     $  (RIGHT(N),N=1,2)/'2480'X,'0'X/, (DIVER(N),N=1,2)/'2500'X,'0'X/,
 c     $  (LOG10(N),N=1,2)/'209A3F9A'X,'CFF884FB'X/, SC/987/
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
+      HVRD1M = '$Revision$'
       IF( PASS1 )  THEN
 
          PASS1 = .FALSE.
