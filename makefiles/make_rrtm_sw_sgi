@@ -11,8 +11,6 @@ EXECNAME = rrtm_sw
 # All the .F files in your program that are recompiled in this directory
 FFILES = rrtm.f         \
          rtrdis.f 	\
-         aerprop.f 	\
-         get_lambda.f 	\
          rrtatm.f	\
          setcoef.f	\
          cldprop_sw.f	\
@@ -24,16 +22,12 @@ FFILES = rrtm.f         \
          R1MACH.f	\
          D1MACH.f	\
          ErrPack.f	\
-         LINPAK.f	\
-         bkdata_band.f	\
-         bkdata_aer.f
+         LINPAK.f	
 
 
 # All the .o files in your program 
 OBJS = rrtm.o         \
          rtrdis.o 	\
-         aerprop.o 	\
-         get_lambda.o 	\
          rrtatm.o	\
          cldprop_sw.o	\
          setcoef.o	\
@@ -45,9 +39,7 @@ OBJS = rrtm.o         \
          R1MACH.o	\
          D1MACH.o	\
          ErrPack.o	\
-         LINPAK.o	\
-         bkdata_band.o	\
-         bkdata_aer.o
+         LINPAK.o	
 
 # Compiler specifications
 FFF = f90

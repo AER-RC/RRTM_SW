@@ -1,17 +1,11 @@
-rrtm_sw : rrtm.o rtrdis.o aerprop.o get_lambda.o rrtatm.o cldprop_sw.o setcoef.o taumoldis.o k_g.o extra.o util_sun.o disort.o R1MACH.o D1MACH.o ErrPack.o LINPAK.o bkdata_band.o bkdata_aer.o
-	f77 -fast -O3  -o  rrtm_sw  rrtm.o rtrdis.o aerprop.o get_lambda.o rrtatm.o cldprop_sw.o setcoef.o taumoldis.o k_g.o extra.o util_sun.o disort.o R1MACH.o D1MACH.o ErrPack.o LINPAK.o bkdata_band.o bkdata_aer.o
+rrtm_sw : rrtm.o rtrdis.o rrtatm.o cldprop_sw.o setcoef.o taumoldis.o k_g.o extra.o util_sun.o disort.o R1MACH.o D1MACH.o ErrPack.o LINPAK.o 
+	f77 -fast -O3  -o  rrtm_sw  rrtm.o rtrdis.o rrtatm.o cldprop_sw.o setcoef.o taumoldis.o k_g.o extra.o util_sun.o disort.o R1MACH.o D1MACH.o ErrPack.o LINPAK.o
 #
 rrtm.o: rrtm.f
 	f77 -fast -O3      -c  rrtm.f
 #
 rtrdis.o: rtrdis.f
 	f77 -fast -O3      -c  rtrdis.f
-#
-aerprop.o: aerprop.f
-	f77 -fast -O3     -c  aerprop.f
-#
-get_lambda.o: get_lambda.f
-	f77 -fast -O3     -c  get_lambda.f
 #
 rrtatm.o: rrtatm.f
 	f77 -fast -O3    -c  rrtatm.f
@@ -48,10 +42,4 @@ ErrPack.o: ErrPack.f
 #
 LINPAK.o: LINPAK.f
 	f77 -fast -O3  -c  LINPAK.f
-#
-bkdata_band.o: bkdata_band.f
-	f77 -fast -O3  -c  bkdata_band.f
-#
-bkdata_aer.o: bkdata_aer.f
-	f77 -fast -O3  -c  bkdata_aer.f
 #
