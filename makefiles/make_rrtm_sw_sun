@@ -8,10 +8,10 @@ SHELL = /bin/sh
 ###############################
 
 PLATFORM = sun
-VERSION = v2.4.1
+VERSION = v2.5
 
 FC = f90
-FCFLAG =  -fast -O3
+FCFLAG =  -fast -xtypemap=real:64,double:64,integer:64
 OUTPUT = rrtm_sw_$(PLATFORM)_$(VERSION)
 CPATH = src
 CDOTO = $(PLATFORM)_$(FC)_sgl.o
@@ -21,24 +21,22 @@ CSET = setcoef
 CATM = rrtatm
 CUTL = util_$(PLATFORM)
 CTAU = taumoldis
-CCLD = cldprop_sw
+CCLD = cldprop
 CEXT = extra
 CKGS = k_g
 CRTR = rtrdis
-CR1M = R1MACH
-CD1M = D1MACH
+CRDI = RDI1MACH
 CERR = ErrPack
 CLPK = LINPAK
 CDIS = disort
 
 
 OBJFIL = $(CRTM).o \
-	 $(CR1M).o \
+	 $(CRDI).o \
 	 $(CRTR).o \
 	 $(CATM).o \
 	 $(CSET).o \
 	 $(CTAU).o \
-	 $(CD1M).o \
 	 $(CERR).o \
 	 $(CUTL).o \
 	 $(CEXT).o \
@@ -48,12 +46,11 @@ OBJFIL = $(CRTM).o \
 	 $(CKGS).o 
 
 OBPATH = $(CDOTO)/$(CRTM).o \
-	 $(CDOTO)/$(CR1M).o \
+	 $(CDOTO)/$(CRDI).o \
 	 $(CDOTO)/$(CRTR).o \
 	 $(CDOTO)/$(CATM).o \
 	 $(CDOTO)/$(CSET).o \
 	 $(CDOTO)/$(CTAU).o \
-	 $(CDOTO)/$(CD1M).o \
 	 $(CDOTO)/$(CERR).o \
 	 $(CDOTO)/$(CUTL).o \
 	 $(CDOTO)/$(CEXT).o \
@@ -63,12 +60,11 @@ OBPATH = $(CDOTO)/$(CRTM).o \
 	 $(CDOTO)/$(CKGS).o 
 
 MODULE = $(CPATH)/$(CRTM).o \
-	 $(CPATH)/$(CR1M).o \
+	 $(CPATH)/$(CRDI).o \
 	 $(CPATH)/$(CRTR).o \
 	 $(CPATH)/$(CATM).o \
 	 $(CPATH)/$(CSET).o \
 	 $(CPATH)/$(CTAU).o \
-	 $(CPATH)/$(CD1M).o \
 	 $(CPATH)/$(CERR).o \
 	 $(CPATH)/$(CUTL).o \
 	 $(CPATH)/$(CEXT).o \
@@ -97,9 +93,9 @@ $(CDOTO)/$(CRTR).o : $(CPATH)/$(CRTR).f
 	$(FC) $(FCFLAG) -c $(CPATH)/$(CRTR).f
 	\mv $(CRTR).o $(CDOTO)
 
-$(CDOTO)/$(CR1M).o : $(CPATH)/$(CR1M).f
-	$(FC) $(FCFLAG) -c $(CPATH)/$(CR1M).f
-	\mv $(CR1M).o $(CDOTO)
+$(CDOTO)/$(CRDI).o : $(CPATH)/$(CRDI).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CRDI).f
+	\mv $(CRDI).o $(CDOTO)
 
 $(CDOTO)/$(CATM).o : $(CPATH)/$(CATM).f
 	$(FC) $(FCFLAG) -c $(CPATH)/$(CATM).f
@@ -112,10 +108,6 @@ $(CDOTO)/$(CSET).o : $(CPATH)/$(CSET).f
 $(CDOTO)/$(CTAU).o : $(CPATH)/$(CTAU).f
 	$(FC) $(FCFLAG) -c $(CPATH)/$(CTAU).f
 	\mv $(CTAU).o $(CDOTO)
-
-$(CDOTO)/$(CD1M).o : $(CPATH)/$(CD1M).f
-	$(FC) $(FCFLAG) -c $(CPATH)/$(CD1M).f
-	\mv $(CD1M).o $(CDOTO)
 
 $(CDOTO)/$(CERR).o : $(CPATH)/$(CERR).f
 	$(FC) $(FCFLAG) -c $(CPATH)/$(CERR).f
