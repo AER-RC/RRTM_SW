@@ -20,7 +20,7 @@ C     per g-value per band.
 
       COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
-      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND
+      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD
       COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX
       COMMON /SURFACE/   IREFLECT,SEMISS(NBANDS)
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
@@ -31,6 +31,8 @@ C     per g-value per band.
       COMMON /SSAGCOM/   SSA(MXLAY,MG)
       COMMON /AERDAT/    ssaaer(mxlay,nbands), phase(mcmu,mxlay,nbands), 
      &                   tauaer(mxlay,nbands)
+      COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),TAUCLOUD(MXLAY,NBANDS),
+     &                   SSACLOUD(MXLAY,NBANDS),XMOM(0:16,MXLAY,NBANDS)
       COMMON /OUTPUT/    TOTUFLUX(0:MXLAY), TOTDFLUX(0:MXLAY),
      &                   DIFDOWN(0:MXLAY), DIRDOWN(0:MXLAY),
      &                   FNET(0:MXLAY), HTR(0:MXLAY)
@@ -57,16 +59,17 @@ C     per g-value per band.
      &          TRNMED( MUMU ), U0U( MUMU, MXLAY ), UAVG( MXLAY ),
      &          UMU( MUMU ), UTAU( MXLAY ),
      &          UU( MUMU, MXLAY, MPHI )
-      DIMENSION PHASERAY(0:NSTR)
+      DIMENSION PHASERAY(0:MXSTR)
       HVRRTR = '%I%'
-      
       DATA PRNT /.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.,
      &     .FALSE.,.FALSE./
 
       PHASERAY(0) = 1.0
       PHASERAY(1) = 0. 
       PHASERAY(2) = 0.1
-      PHASERAY (3:NSTR) = 0.
+      DO 120 ISTR = 3, NSTR
+         PHASERAY (ISTR) = 0.
+ 120  CONTINUE
 
       SECZEN = 1. / ZENITH
 
@@ -147,18 +150,23 @@ C ***    Downward radiative transfer.
          UMU0 = abs(1./SECZEN)
          DO 3900 LAY = NLAYERS, 1, -1
             TAUREV(NLAYERS-LAY+1) = TAUG(LAY,IG)+tauaer(lay,iband)
+     &           +taucloud(lay,iband)
             scataer = ssaaer(lay,iband) * tauaer(lay,iband)
             scatray = ssa(lay,ig) * taug(lay,ig)
-            SSALB(NLAYERS-LAY+1) = (scataer + scatray)/
+            scatcld = ssacloud(lay,iband)*taucloud(lay,iband)
+            SSALB(NLAYERS-LAY+1) = (scataer + scatray+scatcld)/
      &           taurev(nlayers-lay+1)
             pmom(0,nlayers-lay+1) = 1.
-            pmom(1,nlayers-lay+1) = scataer * phase(1,lay,iband) / 
-     &           (scataer + scatray) 
+            pmom(1,nlayers-lay+1) = (scataer * phase(1,lay,iband)+
+     &           scatcld*xmom(1,lay,iband))/ 
+     &           (scataer + scatray + scatcld) 
             pmom(2,nlayers-lay+1) = (scataer * phase(2,lay,iband) + 
-     &           scatray*phaseray(2)) / (scataer + scatray)
+     &           scatray*phaseray(2) + scatcld*xmom(2,lay,iband))
+     &           / (scataer + scatray + scatcld)
             DO 3850 K = 3, NSTR
-               PMOM(K,nlayers-LAY+1) = scataer * phase(k,lay,iband) / 
-     &              (scataer + scatray)
+               PMOM(K,nlayers-LAY+1) = (scataer * phase(k,lay,iband)
+     &              +scatcld*xmom(k,lay,iband))/ 
+     &              (scataer + scatray + scatcld)
  3850       CONTINUE
  3900    CONTINUE
          CALL DISORT( NLAYERS, TAUREV, SSALB, PMOM, TEMPER, WVNMLO,

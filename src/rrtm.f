@@ -50,11 +50,14 @@ C        level and the heating rate for each layer
       COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
       COMMON /PRECISE/   ONEMINUS
-      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND
+      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD
       COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX
       COMMON /SURFACE/   IREFLECT,SEMISS(NBANDS)
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
+      COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),
+     &     TAUCLOUD(MXLAY,NBANDS),SSACLOUD(MXLAY,NBANDS),
+     &     xmom(0:16,MXLAY,NBANDS)
       COMMON /OUTPUT/    TOTUFLUX(0:MXLAY), TOTDFLUX(0:MXLAY),
      &                   DIFDOWNFLUX(0:MXLAY), DIRDOWNFLUX(0:MXLAY),
      &                   FNET(0:MXLAY), HTR(0:MXLAY)
@@ -116,10 +119,11 @@ C        that is specific to this atmosphere, especially some of the
 C        coefficients and indices needed to compute the optical depths
 C        by interpolating data from stored reference atmospheres. 
 
+         IF (ICLD .EQ. 1) CALL CLDPROP_SW(ICLDATM)
+
          CALL SETCOEF
 
 C ***    Call the radiative transfer routine.
-
          CALL RTRDIS
 
          IF (IOUT .LT. 0) GO TO 4000
@@ -221,7 +225,7 @@ C      PARAMETER (MAXPROD = MXLAY*MAXXSEC)
 
       DIMENSION ALTZ(0:MXLAY),IXTRANS(14)
 
-      COMMON /CONTROL/  IAER, NSTR, IOUT, ISTART, IEND
+      COMMON /CONTROL/  IAER, NSTR, IOUT, ISTART, IEND, ICLD
       COMMON /CONSTANTS/PI,FLUXFAC,HEATFAC
       COMMON /SWPROP/   ZENITH, ALBEDO, ADJFLUX
       COMMON /SURFACE/  IREFLECT,SEMISS(NBANDS)
@@ -265,7 +269,18 @@ C  Initialize molecular amount and cross section arrays to zero here.
  1000 CONTINUE
       READ (IRD,9009,END=8800) CTEST
       IF (CTEST .NE. CDOLLAR) GO TO 1000
-      READ (IRD,9011) IAER, IATM, IXSECT, ISTRM, IOUT, ICLD, IOPT
+      READ (IRD,9011) IAER, IATM, ISCAT, ISTRM, IOUT, ICLD
+      
+C     No cross-sections implemented in shortwave.
+      IXSECT = 0
+
+C     If clouds are present, read in appropriate input file, IN_CLD_RRTM.
+      IF (ICLD .EQ. 1) CALL READCLD
+
+      IF (ISCAT .NE. O) THEN
+         PRINT *,' INVALID SCATTERING OPTION CHOSEN'
+         STOP
+      ENDIF
       IF (ISTRM .EQ. 0) THEN 
          NSTR = 4
       ELSE IF  (ISTRM .EQ. 1) THEN
@@ -276,6 +291,7 @@ C  Initialize molecular amount and cross section arrays to zero here.
          PRINT *, 'INVALID VALUE FOR ISTRM'
          STOP
       ENDIF
+
       IF (IAER.EQ.10) CALL READAER
 
       READ (IRD,9020) JULDAT, SZA
@@ -286,11 +302,15 @@ C  Initialize molecular amount and cross section arrays to zero here.
          ADJFLUX = EARTH_SUN (JULDAT)
       ENDIF
 
-      READ (IRD,9012) IEMIS, IREFLECT, SEMISS(IB1:IB2)
+      READ (IRD,9012) IEMIS, IREFLECT, (SEMISS(IB),IB=IB1,IB2)
       IF (IEMIS .EQ. 0) THEN
-         SEMISS(IB1:IB2) = 1.
+         DO 1500 IB = IB1, IB2
+            SEMISS(IB) = 1.
+ 1500    CONTINUE
       ELSEIF (IEMIS .EQ. 1) THEN
-         SEMISS(IB1:IB2) = SEMISS(IB1)
+         DO 1600 IB = IB1, IB2
+            SEMISS(IB) = SEMISS(IB1)
+ 1600    CONTINUE
       ELSEIF (IEMIS .EQ. 2) THEN
 C          PRINT *, 'THESE ARE THE INPUT EMISSIVITY VALUES'
 C          PRINT *, SEMISS(IB1:IB2)
@@ -299,7 +319,7 @@ C          PRINT *, SEMISS(IB1:IB2)
           STOP
       ENDIF
      
-               IF (IATM .EQ. 0) THEN
+      IF (IATM .EQ. 0) THEN
          READ (IRD,9013) IFORM,NLAYERS,NMOL
          IF (NMOL.EQ.0) NMOL = 7                                    
          READ (IRD,FORM1(IFORM)) PAVEL(1),TAVEL(1),SECNTK,CINP,
@@ -390,8 +410,8 @@ C     Test for mixing ratio input.
 
  9009 FORMAT (A1,1X,I2,I2,I2)
  9010 FORMAT (A1)
- 9011 FORMAT (18X,I2,29X,I1,19X,I1,14X,I1,2X,I3,4X,I1,4X,I1)
- 9012 FORMAT (11X,I1,2X,I1,14F5.2)
+ 9011 FORMAT (18X,I2,29X,I1,32X,I1,1X,I1,2X,I3,4X,I1)
+ 9012 FORMAT (11X,I1,2X,I1,14F5.3)
  9013 FORMAT (1X,I1,I3,I5)                                     
  9020 format (12X, I3, 3X, F7.4)
  9300 FORMAT (I5)
@@ -399,6 +419,58 @@ C     Test for mixing ratio input.
 
       RETURN
       END 
+
+C************************  SUBROUTINE READCLD  *****************************C
+
+      SUBROUTINE READCLD
+
+C     Purpose:  To read in IN_CLD_RRTM_SW, the file that contains input 
+C               cloud properties.
+
+      INCLUDE 	'param.f'
+
+      COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
+     &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
+      COMMON /CLOUDIN/   INFLAG,CLDDAT1(MXLAY),CLDDAT2(MXLAY),
+     &                   ICEFLAG,LIQFLAG,CLDDAT3(MXLAY),CLDDAT4(MXLAY)
+      COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),
+     &     TAUCLOUD(MXLAY,NBANDS),SSACLOUD(MXLAY,NBANDS),
+     &     xmom(0:16,MXLAY,NBANDS)
+      CHARACTER*1 CTEST, CPERCENT
+
+      DATA CPERCENT /'%'/
+      IRDCLD = 11
+
+      OPEN(IRDCLD,FILE='IN_CLD_RRTM',FORM='FORMATTED')
+
+C     Read in cloud input option.  
+      READ(IRDCLD,9050) INFLAG, ICEFLAG, LIQFLAG
+
+      DO 500 LAY = 1, NLAYERS
+         CLDFRAC(LAY) = 0.
+ 500  CONTINUE
+
+ 1000 CONTINUE
+C     For INFLAG = 0 or 1, for each cloudy layer only LAY, FRAC, and
+C     DAT1 are pertinent.  If CTEST = '%', then there are no more 
+C     cloudy layers to process.
+      READ (IRDCLD,9100,END=9000) CTEST,LAY,FRAC,DAT1,DAT2,DAT3,DAT4
+      IF (CTEST .EQ. CPERCENT) GO TO 9000
+      CLDFRAC(LAY) = FRAC
+      CLDDAT1(LAY) = DAT1
+      CLDDAT2(LAY) = DAT2
+      CLDDAT3(LAY) = DAT3
+      CLDDAT4(LAY) = DAT4
+      GO TO 1000
+
+ 9000 CONTINUE
+      CLOSE(IRDCLD)
+
+ 9050 FORMAT (3X,I2,4X,I1,4X,I1)
+ 9100 FORMAT (A1,1X,I3,5E10.5)
+
+      RETURN
+      END
 
 C************************  SUBROUTINE READAER  *****************************C
 
@@ -412,9 +484,9 @@ C               aerosol properties.
       real aerpar(3), ssa(nbands), asym(nbands), aod(mxlay),aod1(nbands)
       real rl1(nbands), rl2(nbands), rlambda(nbands), specfac(nbands)
 
-      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND
+      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
-     &                   PZ(0:MXLAY),TZ(0:MXLAY)
+     &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
       common /AERDAT/    ssaaer(mxlay,nbands), phase(mcmu,mxlay,nbands), 
      &                   tauaer(mxlay,nbands)
       CHARACTER*1 CTEST, CPERCENT
@@ -422,14 +494,16 @@ C               aerosol properties.
       DATA CPERCENT /'%'/
 
       integer lay(mxlay)
-      aod(:) = 0.
 
       eps = 1.e-10
       IRDAER = 12
       OPEN(IRDAER,FILE='IN_AER_RRTM',FORM='FORMATTED')
 
       do ib = ib1, ib2
-         tauaer(:,ib) = 0.
+         DO 500 ILAY = 1, MXLAY
+            AOD(ILAY) = 0.
+            tauaer(ILAY,ib) = 0.
+ 500     CONTINUE
          rl1(ib) = 10000. / wavenum1(ib)	
          rl2(ib) = 10000. / wavenum2(ib)	
       enddo
@@ -465,7 +539,9 @@ c           Set defaults to get standard Angstrom relation.
      &              rlambda(ib)**aerpar(1))
             enddo
          endif
-c        For this aerosol, read in layers and optical depth information.
+C        For this aerosol, read in layers and optical depth information.
+C        Store a nonzero optical depth in aod to check for double
+C        specification.
          do il = 1, nlay
             read(irdaer, 9012) lay(il), (aod1(ib), ib = ib1,ib2)
             if (aod(lay(il)) .lt. eps) then
@@ -487,30 +563,34 @@ c        For this aerosol, read in layers and optical depth information.
             endif
          enddo
 
-         write(*,*)nlay,issa,iasym
+
 c        For this aerosol, read and store optical properties
          read (irdaer, 9013) (ssa(ib), ib = ib1,ib2)
-         write(*,*)ssa(16)
-         do il = 1, nlay
-            if (issa .eq. 0) then 
-               ssaaer(lay(il),ib1:ib2) = ssa(ib1)
-            else
-               ssaaer(lay(il),ib1:ib2) = ssa(ib1:ib2)
-            endif
-         enddo
+
+         DO 2000 IB = IB1, IB2
+            do il = 1, nlay
+               if (issa .eq. 0) then 
+                  ssaaer(lay(il),IB) = ssa(ib1)
+               else
+                  ssaaer(lay(il),IB) = ssa(IB)
+               endif
+            enddo
+ 2000    CONTINUE
 
          if (iasym .lt. 2) then
             read (irdaer, 9013) (asym(ib), ib = ib1,ib2)
-         write(*,*)asym(16)
-            do il = 1, nlay
-               do istr = 1,  nstr
-                  if (iasym .eq. 0) then 
-                     phase(istr,lay(il),ib1:ib2) = asym(ib1)**istr
-                  elseif (iasym .eq. 1) then
-                     phase(istr,lay(il),ib1:ib2) = asym(ib1:ib2)**istr
-                  endif
+
+            DO 3000 IB = IB1, IB2
+               do il = 1, nlay
+                  do istr = 1,  nstr
+                     if (iasym .eq. 0) then 
+                        phase(istr,lay(il),IB) = asym(ib1)**istr
+                     elseif (iasym .eq. 1) then
+                        phase(istr,lay(il),IB) = asym(IB)**istr
+                     endif
+                  enddo
                enddo
-            enddo
+ 3000       CONTINUE
          else
             do il = 1, nlay
                do istr = 1, nstr
@@ -519,8 +599,6 @@ c        For this aerosol, read and store optical properties
                enddo
             enddo
          endif
-         write(*,*) ((phase(istr,1,ib),istr=1,4), 
-     &                 ib = ib1,ib2)
 
       enddo
 
@@ -529,7 +607,7 @@ c        For this aerosol, read and store optical properties
       CLOSE(IRDAER)
 
  9010 format (4x, i1)
- 9011 format (4x, i1, 4x, i1, 4x, i1, 4x, i1, 3f8.2)
+ 9011 format (4x, i1, 4x, i1, 4x, i1, 4x, i1, 3f8.3)
  9012 format (2x, i3, 14f7.4)
  9013 format (14f5.3)
 
