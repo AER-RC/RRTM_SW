@@ -134,7 +134,7 @@ C
 C                                                                               
 C     ASSIGN SCCS VERSION NUMBER TO MODULE                                      
 C                                                                               
-      HVRRTM = '$Revision$'      
+      HVRATM = '$Revision$'      
 C                                                                        FA01050
 C     IBDIM IS THE MAXIMUM NUMBER OF LAYERS FOR OUTPUT TO LBLRTM         FA01060
 C     IOUTDM IS THE MAXIMUN NUMBER OF OUTPUT LAYERS                      FA01070
