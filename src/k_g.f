@@ -1,7 +1,7 @@
-C     path:      %P%
-C     revision:  %I%
-C     created:   %G%  %U%
-C     presently: %H%  %T%
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
 ****************************************************************************
 
       BLOCK DATA KGB16
