@@ -1,0 +1,155 @@
+Date: April 2004
+
+This is an update for users of RRTM_SW, the shortwave rapid 
+radiative transfer model developed by Atmospheric and Environmental 
+Research, Inc.  Users may obtain update information and retrieve code 
+via the web-site http://rtweb.aer.com or via anonymous ftp to ftp.aer.com 
+and change directory to pub/downloads/aer_rrtm_sw.  Binary data transfer 
+should be used when downloading each file.
+
+RRTM_SW v2.4.1 has been updated to RRTM_SW v2.5
+
+		* Updated DISORT v1 to DISORT v2.
+
+		* Improved cloud properties routine to:
+
+		a) include scattering properties of spheres, based on the 
+		parameterization by Key et al. in the STREAMER RT code.  
+	
+		b) to output a file (OUT_CLD_RRTM) with the cloud scattering 
+		properties by layer. 
+
+		c) changed name of cldprop_sw.f to cldprop.f to be 
+		consistent with RRTM_LW structure.
+
+		* Updated atmospheric properties module RRTATM to be 
+		compatible with the most recent version of LBLATM v8.1.
+	
+	 	* Removed unnecessary duplicate calculations which 
+		occurred for option IOUT=98.
+
+		* Added new solar variability option (ISOLVAR).
+
+	 	* Changed number of significant digits in the net flux 
+		output in OUTPUT_RRTM.  
+	
+		* Changed format statement in subroutine readaer to allow
+	        more than 4 aerosol layers (naer, format statement 9010).
+
+        	* Updated instruction manual.
+
+		* Modified makefiles to be double precision, as required 
+		to keep robust results from DISORT.
+
+
+*********************************************************************
+
+CODE: RRTM_SW
+
+
+                          *** KEY FEATURES ***
+                           *** IN RRTM_SW ***
+
+^ k-distributions are obtained directly from a line-by-line radiative
+transfer code, LBLRTM , which has been extensively validated against 
+observations, principally at the ARM SGP site 
+
+^ fluxes and cooling  rates can be calculated over fourteen 
+contiguous bands in the  shortwave (820-50000 cm-1) 
+
+^ modeled sources of extinction are water vapor, carbon dioxide, 
+ozone, methane, oxygen, aerosols, and Rayleigh scattering, and clouds 
+
+     ^ liquid cloud optical properties are parameterized using the Hu 
+       and Stamnes parameterization (J. Climate, 6, 728-742, 1993) 
+     ^ ice cloud optical properties are parameterized using the 
+       Fu parameterization (J. Climate, 9, 2058 - 2082, 1996) 
+
+^ DISORT is used to perform scattering calculations 
+(Stamnes et al., Appl. Opt. 27, 2502-2509, 1988) 
+
+^ agreement with clear-sky line-by-line calculations: 
+1 W/m2 for direct irradiance, 2 W/m2 for diffuse irradiance 
+
+^ Important note:  Version 2.4 of RRTM_SW handles only 
+100% cloudy cases.  Partial cloudiness is not an option at this time.  
+
+********************************************************************
+
+*********************************************************************
+
+                          RRTM_SW References
+
+Mlawer, E.J., and S.A. Clough, Shortwave and longwave enhancements 
+in the rapid radiative transfer model, in Proceedings of the 7th 
+Atmospheric Radiation Measurement (ARM) Science Team Meeting, 
+U.S. Department of Energy, CONF-970365, 1998. 
+
+Mlawer, E.J., and S.A. Clough, On the extension of rapid radiative 
+transfer model to the shortwave region, in Proceedings of the 6th 
+Atmospheric Radiation Measurement (ARM) Science Team Meeting, 
+U.S. Department of Energy, CONF-9603149, 1997. 
+
+Mlawer, E.J., S.J. Taubman, P.D. Brown,  M.J. Iacono and S.A. Clough: 
+RRTM, a validated correlated-k model for the longwave.  
+J. Geophys. Res., 102, 16,663-16,682, 1997 
+
+***********************************************************************
+
+***********************************************************************
+                          
+                           Obtaining RRTM_SW
+
+Anonymous FTP of RRTM_SW via rtweb.aer.com
+
+Source Code, Makefiles, Instructions:
+
+pub/downloads/aer_rrtm_sw/aer_rrtm_sw_v2.5.tar.gz 
+
+Example Run Files:
+
+pub/downloads/aer_rrtm_sw/aer_rrtm_sw_examples_v2.5.tar.gz
+
+Latest Update Description:
+
+pub/downloads/aer_rrtm_sw/update_rrtm_sw_v2.5.txt 
+
+Note:  To FTP directly from web brower you must have you preferences
+set to send email address an anonymous FTP password. 
+
+Can also use anonymous FTP performing the following:
+
+ftp ftp.aer.com 
+
+login: anonymous 
+password:  your email address 
+
+cd pub/downloads/aer_rrtm_sw/ 
+
+get aer_rrtm_sw_v2.5.tar.gz
+get aer_rrtm_sw_examples_v2.5.tar.gz  
+
+To unpack tarred and zipped files on Unix:
+
+gunzip aer_rrtm_sw_v2.5.tar.gz
+tar -xvf aer_rrtm_sw_v2.5.tar
+gunzip aer_rrtm_sw_examples_v2.5.tar.gz
+tar -xvf aer_rrtm_sw_examples_v2.5.tar
+
+***********************************************************************
+
+If you have any questions, problems, or comments, please contact
+either Eli Mlawer or Jennifer Delamere at
+
+Atmospheric and Environmental Research, Inc.
+131 Hartwell Avenue
+Lexington, MA 02421
+
+e-mail addresses: emlawer@aer.com, jdelamer@aer.com
+
+***********************************************************************
+
+ 
+
+
+
