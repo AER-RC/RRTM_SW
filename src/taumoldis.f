@@ -515,8 +515,8 @@ C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
       LAYSOLFR = LAYTROP
       DO 2500 LAY = 1, LAYTROP
-         IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
-     &        LAYSOLFR = LAY
+         IF (JP(LAY) .LT. LAYREFFR .AND. JP(LAY+1) .GE. LAYREFFR) 
+     &        LAYSOLFR = MIN(LAY+1,LAYTROP)
          SPECCOMB = COLH2O(LAY) + STRRAT*COLCH4(LAY)
          SPECPARM = COLH2O(LAY)/SPECCOMB 
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS
@@ -677,8 +677,8 @@ C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
       LAYSOLFR = LAYTROP
       DO 2500 LAY = 1, LAYTROP
-         IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
-     &        LAYSOLFR = LAY
+         IF (JP(LAY) .LT. LAYREFFR .AND. JP(LAY+1) .GE. LAYREFFR) 
+     &        LAYSOLFR = MIN(LAY+1,LAYTROP)
          SPECCOMB = COLH2O(LAY) + STRRAT*COLCO2(LAY)
          SPECPARM = COLH2O(LAY)/SPECCOMB 
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS
@@ -795,14 +795,7 @@ C     Rayleigh extinction coefficient at v = 5670 cm-1.
      &     2.96619E-08,0.,0.,0./
 
       DATA SFLUXREF/
-C     Planck
 C     Kurucz
-C     lay 3
-c     &     9.30173, 8.91087, 8.23423, 7.40677,
-c     &     6.12647, 5.24308, 4.24807, 3.20083,
-c     &     2.16313,0.234472,0.193277,0.152640,
-c     &     0.110635, 6.97449E-02, 2.71447E-02, 3.50937E-03/
-C     lay 1
      &     9.34081, 8.93720, 8.19346, 7.39196,
      &     6.12127, 5.23956, 4.24941, 3.20013,
      &     2.16047,0.234509,0.194593,0.151512,
@@ -818,8 +811,8 @@ C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
       LAYSOLFR = LAYTROP
       DO 2500 LAY = 1, LAYTROP
-         IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
-     &        LAYSOLFR = LAY
+         IF (JP(LAY) .LT. LAYREFFR .AND. JP(LAY+1) .GE. LAYREFFR) 
+     &        LAYSOLFR = MIN(LAY+1,LAYTROP)
          IND0 = ((JP(LAY)-1)*5+(JT(LAY)-1))*NSPA(20) + 1
          IND1 = (JP(LAY)*5+(JT1(LAY)-1))*NSPA(20) + 1
          INDS = INDSELF(LAY)
@@ -967,8 +960,8 @@ C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
       LAYSOLFR = LAYTROP
       DO 2500 LAY = 1, LAYTROP
-         IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
-     &        LAYSOLFR = LAY
+         IF (JP(LAY) .LT. LAYREFFR .AND. JP(LAY+1) .GE. LAYREFFR) 
+     &        LAYSOLFR = MIN(LAY+1,LAYTROP)
          SPECCOMB = COLH2O(LAY) + STRRAT*COLCO2(LAY)
          SPECPARM = COLH2O(LAY)/SPECCOMB 
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS
@@ -1154,8 +1147,8 @@ C     vapor self-continuum is interpolated (in temperature) separately.
       LAYSOLFR = LAYTROP
 
       DO 2500 LAY = 1, LAYTROP
-         IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
-     &        LAYSOLFR = LAY
+         IF (JP(LAY) .LT. LAYREFFR .AND. JP(LAY+1) .GE. LAYREFFR) 
+     &        LAYSOLFR = MIN(LAY+1,LAYTROP)
          O2CONT = 4.35e-4*colo2(lay)/(350.0*2.0)
          SPECCOMB = COLH2O(LAY) + O2ADJ*STRRAT*COLO2(LAY)
          SPECPARM = COLH2O(LAY)/SPECCOMB 
@@ -1289,8 +1282,8 @@ C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
       LAYSOLFR = LAYTROP
       DO 2500 LAY = 1, LAYTROP
-         IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
-     &        LAYSOLFR = LAY
+         IF (JP(LAY) .LT. LAYREFFR .AND. JP(LAY+1) .GE. LAYREFFR) 
+     &        LAYSOLFR = MIN(LAY+1,LAYTROP)
          IND0 = ((JP(LAY)-1)*5+(JT(LAY)-1))*NSPA(23) + 1
          IND1 = (JP(LAY)*5+(JT1(LAY)-1))*NSPA(23) + 1
          INDS = INDSELF(LAY)
@@ -1474,8 +1467,8 @@ C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
       LAYSOLFR = LAYTROP
       DO 2500 LAY = 1, LAYTROP
-         IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
-     &        LAYSOLFR = LAY
+         IF (JP(LAY) .LT. LAYREFFR .AND. JP(LAY+1) .GE. LAYREFFR) 
+     &        LAYSOLFR = MIN(LAY+1,LAYTROP)
          SPECCOMB = COLH2O(LAY) + STRRAT*COLO2(LAY)
          SPECPARM = COLH2O(LAY)/SPECCOMB 
          IF (SPECPARM .GE. ONEMINUS) SPECPARM = ONEMINUS
@@ -1617,8 +1610,8 @@ C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
       LAYSOLFR = LAYTROP
       DO 2500 LAY = 1, LAYTROP
-         IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
-     &        LAYSOLFR = LAY
+         IF (JP(LAY) .LT. LAYREFFR .AND. JP(LAY+1) .GE. LAYREFFR) 
+     &        LAYSOLFR = MIN(LAY+1,LAYTROP)
          IND0 = ((JP(LAY)-1)*5+(JT(LAY)-1))*NSPA(25) + 1
          IND1 = (JP(LAY)*5+(JT1(LAY)-1))*NSPA(25) + 1
          DO 2000 IG = 1, NG(25)
@@ -1630,7 +1623,6 @@ C     vapor self-continuum is interpolated (in temperature) separately.
      &           FAC11(LAY) * ABSA(IND1+1,IG)) +
      &           COLO3(LAY) * ABSO3A(IG) +
      &           TAURAY
-c            print*,'TAUMOL',lay,ig,tauray,taug(lay,ig)-tauray
             SSA(LAY,IG) = TAURAY/TAUG(LAY,IG)
             IF (LAY .EQ. LAYSOLFR) SFLUXZEN(IG) = SFLUXREF(IG) 
  2000    CONTINUE
@@ -1678,6 +1670,15 @@ C  Input
       COMMON /INTFAC/   FAC00(MXLAY),FAC01(MXLAY),                            
      &                  FAC10(MXLAY),FAC11(MXLAY)                             
       COMMON /INTIND/   JP(MXLAY),JT(MXLAY),JT1(MXLAY)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
       DIMENSION SFLUXREF(MG),RAYL(MG)
 
@@ -1750,6 +1751,15 @@ C  Input
       COMMON /SELF/     SELFFAC(MXLAY), SELFFRAC(MXLAY), INDSELF(MXLAY)
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K27/      KA(5,13,MG),KB(5,13:59,MG)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
       DIMENSION ABSA(65,MG), ABSB(235,MG), SFLUXREF(MG)
       DIMENSION RAYL(MG)
@@ -1766,12 +1776,6 @@ C     the total irradiance in this band differs from the corresponding
 C     total in the "high-resolution" version of the Kurucz function.
 C     Therefore, below these values are scaled by the factor SCALEKUR.
 C     Kurucz
-C     lay = 59
-c     &     14.1631, 11.4242, 8.67447, 5.55706,
-c     &     3.81796, 1.56911, 1.15232, 1.09832,
-c     &     0.637332, 7.74644E-02, 6.53217E-02, 6.44599E-02,
-c     &     4.04686E-02, 2.19088E-02, 8.01695E-03, 6.13866E-04/
-C     lay 32
      &     14.0526, 11.4794, 8.72590, 5.56966,
      &     3.80927, 1.57690, 1.15099, 1.10012,
      &     0.658212, 5.86859E-02, 5.56186E-02, 4.68040E-02,
@@ -1781,7 +1785,7 @@ C     lay 32
 
       REAL KA, KB
       HVRTAU = '$Revision$'
-      LAYREFFR = 59
+      LAYREFFR = 32
       SCALEKUR = 50.15/48.37
 
 C     Compute the optical depth by interpolating in ln(pressure), 
@@ -1898,7 +1902,7 @@ C     Kurucz
 C     Compute the optical depth by interpolating in ln(pressure), 
 C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
-      LAYSOLFR = NLAYERS
+
       DO 2500 LAY = 1, LAYTROP
          SPECCOMB = COLO3(LAY) + STRRAT*COLO2(LAY)
          SPECPARM = COLO3(LAY)/SPECCOMB 
@@ -1932,6 +1936,7 @@ C     vapor self-continuum is interpolated (in temperature) separately.
  2000    CONTINUE
  2500 CONTINUE
 
+      LAYSOLFR = NLAYERS
       DO 3500 LAY = LAYTROP+1, NLAYERS
          IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
      &        LAYSOLFR = LAY
@@ -2033,11 +2038,6 @@ C     Rayleigh extinction coefficient at v = 2200 cm-1.
      &     0.215562, 0.218087, 0.220918, 0.218546/
 
       DATA SFLUXREF/
-C     lay 49
-c     &     1.18312, 1.83946, 2.00176, 1.88728,
-c     &     1.67839, 1.26066, 1.05445, 0.950619,
-c     &     0.750580, 8.23056E-02, 6.67757E-02, 5.15736E-02,
-c     &     4.06913E-02, 2.85699E-02, 1.14927E-02, 1.65473E-03/
      &     1.32880, 2.14018, 1.97612, 1.79000,
      &     1.51242, 1.22977, 1.06052, 0.800996,
      &     0.748053, 8.64369E-02, 7.10675E-02, 5.62425E-02,
@@ -2050,7 +2050,7 @@ c     &     4.06913E-02, 2.85699E-02, 1.14927E-02, 1.65473E-03/
 C     Compute the optical depth by interpolating in ln(pressure), 
 C     temperature, and appropriate species.  Below LAYTROP, the water
 C     vapor self-continuum is interpolated (in temperature) separately.  
-      LAYSOLFR = NLAYERS
+
       DO 2500 LAY = 1, LAYTROP
          IND0 = ((JP(LAY)-1)*5+(JT(LAY)-1))*NSPA(29) + 1
          IND1 = (JP(LAY)*5+(JT1(LAY)-1))*NSPA(29) + 1
@@ -2075,6 +2075,7 @@ C     vapor self-continuum is interpolated (in temperature) separately.
  2000    CONTINUE
  2500 CONTINUE
 
+      LAYSOLFR = NLAYERS
       DO 3500 LAY = LAYTROP+1, NLAYERS
          IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
      &        LAYSOLFR = LAY
