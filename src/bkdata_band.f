@@ -1,10 +1,25 @@
-	block data rrtm_band
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
 
-	include 'param.f'
+      block data rrtm_band
 
-        COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
-        COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
+      include 'param.f'
 
+      COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
+      COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      DATA HVRBKB /'$Revision$'/
       DATA WAVENUM1(16) /2600./,WAVENUM2(16) /3250./,DELWAVE(16) /650./
       DATA WAVENUM1(17) /3250./,WAVENUM2(17) /4000./,DELWAVE(17) /750./
       DATA WAVENUM1(18) /4000./,WAVENUM2(18) /4650./,DELWAVE(18) /650./
