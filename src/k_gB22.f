@@ -2,15 +2,27 @@ C     path:      $Source$
 C     author:    $Author$
 C     revision:  $Revision$
 C     created:   $Date$
+C
+C  --------------------------------------------------------------------------
+C |                                                                          |
+C |  Copyright 2002, 2003, Atmospheric & Environmental Research, Inc. (AER). |
+C |  This software may be used, copied, or redistributed as long as it is    |
+C |  not sold and this copyright notice is reproduced on each copy made.     |
+C |  This model is provided as is without any express or implied warranties. |
+C |                       (http://www.rtweb.aer.com/)                        |
+C |                                                                          |
+C  --------------------------------------------------------------------------
+
       PARAMETER (MG = 16)
       REAL KA(9,5,13,MG),KB(5,13:59,MG)
       DIMENSION SELFREF(10,MG),FORREF(3,16)
 
-      COMMON /HVRSN22/ HVRKG22
+      COMMON /CVRSN22/ HNAMKG22,HVRKG22
       COMMON /K22/    KA,KB,SELFREF,FORREF
 
-      CHARACTER*15 HVRKG22
+      CHARACTER*18 HNAMKG22,HVRKG22
 
+      DATA HNAMKG22 / '        k_gb22.f:' /
       DATA HVRKG22 /'$Revision$'/
 
 C     The array KA contains absorption coefs at the 16 chosen g-values 

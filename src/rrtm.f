@@ -2,6 +2,17 @@ C     path:      $Source$
 C     author:    $Author$
 C     revision:  $Revision$
 C     created:   $Date$
+C
+C  --------------------------------------------------------------------------
+C |                                                                          |
+C |  Copyright 2002, 2003, Atmospheric & Environmental Research, Inc. (AER). |
+C |  This software may be used, copied, or redistributed as long as it is    |
+C |  not sold and this copyright notice is reproduced on each copy made.     |
+C |  This model is provided as is without any express or implied warranties. |
+C |                       (http://www.rtweb.aer.com/)                        |
+C |                                                                          |
+C  --------------------------------------------------------------------------
+
 ****************************************************************************
 *                                                                          *
 *                               RRTM_SW                                    *
@@ -12,8 +23,8 @@ C     created:   $Date$
 *                    FOR THE SOLAR SPECTRAL REGION                         *
 *                                                                          *
 *            ATMOSPHERIC AND ENVIRONMENTAL RESEARCH, INC.                  *
-*                        840 MEMORIAL DRIVE                                *
-*                        CAMBRIDGE, MA 02139                               *
+*                        131 HARTWELL AVE                                  *   
+*                        LEXINGTON, MA 02421                               *
 *                                                                          *
 *                                                                          *
 *                           ELI J. MLAWER                                  *   
@@ -55,69 +66,94 @@ C        level and the heating rate for each layer
       COMMON /PRECISE/   ONEMINUS
       COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
      &                   idelm, isccos
-      COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX
+      COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX(NBANDS)
       COMMON /SURFACE/   IREFLECT,SEMISS(NBANDS)
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
+      COMMON /IFIL/     IRD,IPR,IPU,IDUM(15)
       COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),
      &     TAUCLOUD(MXLAY,NBANDS),SSACLOUD(MXLAY,NBANDS),
      &     xmom(0:16,MXLAY,NBANDS),taucldorig(mxlay,nbands)
-      COMMON /OUTPUT/    TOTUFLUX(0:MXLAY), TOTDFLUX(0:MXLAY),
-     &                   DIFDOWNFLUX(0:MXLAY), DIRDOWNFLUX(0:MXLAY),
-     &                   FNET(0:MXLAY), HTR(0:MXLAY)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /OUTPUT/    TOTUFLUX(0:MXLAY,0:nbands), 
+     &                   TOTDFLUX(0:MXLAY,0:nbands),
+     &                   DIFDOWNFLUX(0:MXLAY,0:nbands), 
+     &                   DIRDOWNFLUX(0:MXLAY,0:nbands),
+     &                   FNET(0:MXLAY,0:nbands), 
+     &                   HTR(0:MXLAY,0:nbands) 
 
-      COMMON /HVRSN16/   HVRKG16
-      COMMON /HVRSN17/   HVRKG17
-      COMMON /HVRSN18/   HVRKG18
-      COMMON /HVRSN19/   HVRKG19
-      COMMON /HVRSN20/   HVRKG20
-      COMMON /HVRSN21/   HVRKG21
-      COMMON /HVRSN22/   HVRKG22
-      COMMON /HVRSN23/   HVRKG23
-      COMMON /HVRSN24/   HVRKG24
-      COMMON /HVRSN25/   HVRKG25
-      COMMON /HVRSN27/   HVRKG27
-      COMMON /HVRSN28/   HVRKG28
-      COMMON /HVRSN29/   HVRKG29
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRRTM/    HNAMRTM,HVRRTM
+      COMMON /CVRSET/    HNAMSET,HVRSET
+      COMMON /CVRATM/    HNAMATM,HVRATM
+      COMMON /CVRUTL/    HNAMUTL,HVRUTL
+      COMMON /CVRTAU/    HNAMTAU,HVRTAU
+      COMMON /CVRCLD/    HNAMCLD,HVRCLD
+      COMMON /CVREXT/    HNAMEXT,HVREXT
+      COMMON /CVRRTR/    HNAMRTR,HVRRTR
+      COMMON /CVRRDI/    HNAMRDI,HVRRDI
+      COMMON /CVRERR/    HNAMERR,HVRERR
+      COMMON /CVRLPK/    HNAMLPK,HVRLPK
+      COMMON /CVRDIS/    HNAMDIS,HVRDIS
 
-      CHARACTER*15 HVRKG16,HVRKG17,HVRKG18,HVRKG19,
-     *             HVRKG20,HVRKG21,HVRKG22,HVRKG23,HVRKG24,
-     *             HVRKG25,HVRKG27,HVRKG28,HVRKG29
+      COMMON /CVRSN16/   HNAMKG16,HVRKG16
+      COMMON /CVRSN17/   HNAMKG17,HVRKG17
+      COMMON /CVRSN18/   HNAMKG18,HVRKG18
+      COMMON /CVRSN19/   HNAMKG19,HVRKG19
+      COMMON /CVRSN20/   HNAMKG20,HVRKG20
+      COMMON /CVRSN21/   HNAMKG21,HVRKG21
+      COMMON /CVRSN22/   HNAMKG22,HVRKG22
+      COMMON /CVRSN23/   HNAMKG23,HVRKG23
+      COMMON /CVRSN24/   HNAMKG24,HVRKG24
+      COMMON /CVRSN25/   HNAMKG25,HVRKG25
+      COMMON /CVRSN26/   HNAMKG26,HVRKG26
+      COMMON /CVRSN27/   HNAMKG27,HVRKG27
+      COMMON /CVRSN28/   HNAMKG28,HVRKG28
+      COMMON /CVRSN29/   HNAMKG29,HVRKG29
+
+      CHARACTER*18 HVRRTM,HVRSET,HVRATM,HVRUTL,HVRTAU,
+     *             HVRCLD,HVREXT,HVRRTR,HVRRDI,HVRERR,
+     *             HVRLPK,HVRDIS
+
+      CHARACTER*18 HNAMRTM,HNAMSET,HNAMATM,HNAMUTL,HNAMTAU,
+     *             HNAMCLD,HNAMEXT,HNAMRTR,HNAMRDI,HNAMERR,
+     *             HNAMLPK,HNAMDIS
+
+      CHARACTER*18 HNAMKG16,HNAMKG17,HNAMKG18,HNAMKG19,
+     *             HNAMKG20,HNAMKG21,HNAMKG22,HNAMKG23,
+     *             HNAMKG24,HNAMKG25,HNAMKG26,HNAMKG27,
+     *             HNAMKG28,HNAMKG29
+
+      CHARACTER*18 HVRKG16,HVRKG17,HVRKG18,HVRKG19,
+     *             HVRKG20,HVRKG21,HVRKG22,HVRKG23,
+     *             HVRKG24,HVRKG25,HVRKG26,HVRKG27,
+     *             HVRKG28,HVRKG29
 
       CHARACTER PAGE
 
       CHARACTER*50 OUTFORM(7)
 
+
 c     Setup format statements for output
 
       DATA OUTFORM 
-     1/'(1X,I3,3X,F7.6,4X,4(F10.4,4X),F10.4,4X,F10.5)',
-     2 '(1X,I3,4X,F6.5,4X,4(F10.4,4X),F10.4,4X,F10.5)',
-     3 '(1X,I3,5X,F5.4,4X,4(F10.4,4X),F10.4,4X,F10.5)',
-     4 '(1X,I3,5X,F5.3,4X,4(F10.4,4X),F10.4,4X,F10.5)',
-     5 '(1X,I3,5X,F5.2,4X,4(F10.4,4X),F10.4,4X,F10.5)',
-     6 '(1X,I3,5X,F5.1,4X,4(F10.4,4X),F10.4,4X,F10.5)',
-     7 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F10.4,4X,F10.5)'/
+     1/'(1X,I3,3X,F7.6,4X,4(F10.4,4X),F11.6,4X,F10.5)',
+     2 '(1X,I3,4X,F6.5,4X,4(F10.4,4X),F11.6,4X,F10.5)',
+     3 '(1X,I3,4X,F6.4,4X,4(F10.4,4X),F11.6,4X,F10.5)',
+     4 '(1X,I3,4X,F6.3,4X,4(F10.4,4X),F11.6,4X,F10.5)',
+     5 '(1X,I3,4X,F6.2,4X,4(F10.4,4X),F11.6,4X,F10.5)',
+     6 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F11.6,4X,F10.5)',
+     7 '(1X,I3,5X,F5.0,4X,4(F10.4,4X),F11.6,4X,F10.5)'/
+
+      PAGE = CHAR(12)
 
       HVRRTM = '$Revision$'      
-
-      IDIS = 1
 
       ONEMINUS = 1. - 1.E-6
 c      PI = 2.*ASIN(1.)
       FLUXFAC = PI * 2.D4  
 
       IWR = 10
-      PAGE = CHAR(12)
+
       
 C     Multiple atmospheres not yet implemented. 
       NUMATMOS = 1
@@ -125,19 +161,18 @@ C     Multiple atmospheres not yet implemented.
 
 C ***    Input atmospheric profile from INPUT_RRTM.
          CALL READPROF
-
-C***     Calculate aerosol optical depths, if aerosols are present
-
-c         IF (IAER .EQ. 10) CALL AERPROP
-
-         ISTART = IB1
-         IEND = IB2
+         
          IFLAG = IOUT
 
- 1000    CONTINUE
          IF (IFLAG .GT. 0 .AND. IFLAG .LE. IB2) THEN
             ISTART = IFLAG
             IEND = IFLAG
+            IPBAND = IFLAG
+         ELSE
+            ISTART = IB1
+            IEND = IB2
+            IPBAND = 0
+            IFLAG = IOUT
          ENDIF
 
 C ***    Calculate information needed by the radiative transfer routine
@@ -145,7 +180,7 @@ C        that is specific to this atmosphere, especially some of the
 C        coefficients and indices needed to compute the optical depths
 C        by interpolating data from stored reference atmospheres. 
          ICLDATM = 0
-         IF (ICLD .EQ. 1) CALL CLDPROP_SW(ICLDATM)
+         IF (ICLD .EQ. 1) CALL CLDPROP(ICLDATM)
 
          CALL SETCOEF
 
@@ -156,9 +191,17 @@ C ***    Call the radiative transfer routine.
 
 C ***    Process output for this atmosphere.
          OPEN (IWR,FILE='OUTPUT_RRTM',FORM='FORMATTED')
-         IF( ISTART .NE. IEND) THEN
+
+ 1000    CONTINUE
+
+         IF (IFLAG .GT. 0 .AND. IFLAG .LE. IB2) THEN
+            ISTART = IFLAG
+            IEND = IFLAG
+            IPBAND = IFLAG
+         ELSE
             IEND = IEND-1
             ISTART = IB2
+            IPBAND = 0
          ENDIF
 
          if (isccos .eq. 1) then 
@@ -195,9 +238,10 @@ C
             ELSE
                INDFORM = 7
             ENDIF
-            WRITE(IWR,OUTFORM(INDFORM)) I, PZ(I), TOTUFLUX(I), 
-     &           DIFDOWNFLUX(I), DIRDOWNFLUX(I), 
-     &           TOTDFLUX(I), FNET(I), HTR(I)
+            WRITE(IWR,OUTFORM(INDFORM)) I, PZ(I), 
+     &           TOTUFLUX(I,IPBAND), DIFDOWNFLUX(I,IPBAND), 
+     &           DIRDOWNFLUX(I,IPBAND), TOTDFLUX(I,IPBAND), 
+     &           FNET(I,IPBAND), HTR(I,IPBAND)
  3000    CONTINUE
          WRITE(IWR,9903)PAGE
  3001    CONTINUE
@@ -211,18 +255,24 @@ C
             GO TO 3500
          ENDIF
          GO TO 1000
-
  3500    CONTINUE
+
 C
 C ***    Output module version numbers
 
-         WRITE(IWR,9910) HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVRUTL,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,
-     *                   HVRCLD,HVRDIS,HVREXT,
-     *                   HVRKG16,HVRKG17,HVRKG18,HVRKG19,
-     *                   HVRKG20,HVRKG21,HVRKG22,HVRKG23,HVRKG24,
-     *                   HVRKG25,HVRKG27,HVRKG28,HVRKG29
+         WRITE(IWR,9910) HNAMRTM, HVRRTM, HNAMATM, HVRATM,
+     *                   HNAMSET, HVRSET, HNAMTAU, HVRTAU,
+     *                   HNAMUTL, HVRUTL, HNAMCLD, HVRCLD,
+     *                   HNAMRTR, HVRRTR, HNAMDIS, HVRDIS, 
+     *                   HNAMRDI, HVRRDI, HNAMERR, HVRERR,
+     *                   HNAMLPK, HVRLPK, HNAMEXT, HVREXT,
+     *             HNAMKG16, HVRKG16, HNAMKG17, HVRKG17, 
+     *             HNAMKG18, HVRKG18, HNAMKG19, HVRKG19, 
+     *             HNAMKG20, HVRKG20, HNAMKG21, HVRKG21, 
+     *             HNAMKG22, HVRKG22, HNAMKG23, HVRKG23, 
+     *             HNAMKG24, HVRKG24, HNAMKG25, HVRKG25, 
+     *             HNAMKG26, HVRKG26, HNAMKG27, HVRKG27, 
+     *             HNAMKG28, HVRKG28, HNAMKG29, HVRKG29 
 
          CLOSE(IWR)
 
@@ -245,21 +295,8 @@ C ***    Output module version numbers
      &        W/m2          W/m2       degree/day')
  9902 FORMAT(1X,I3,3X,F11.6,4X,1P,2(G12.6,2X),G13.6,3X,G16.9,0P)
  9903 FORMAT(A)
- 9910 FORMAT('  Modules and versions used in this calculation:',/,/,5X,
-     *       '       rrtm.f: ',4X,A15,10X,'    rtrdis.f: ',6X,A15,/,5X,
-     *       '     rrtatm.f: ',4X,A15,10X,'   setcoef.f: ',6X,A15,/,5X,
-     *       '  taumoldis.f: ',4X,A15,10X,'   util_xx.f: ',6X,A15,/,5X,
-     *       '     D1MACH.f: ',4X,A15,10X,'    R1MACH.f: ',6X,A15,/,5X,
-     *       '    ErrPack.f: ',4X,A15,10X,'    LINPAK.f: ',6X,A15,/,5X,
-     *       ' cldprop_sw.f: ',4X,A15,10X,'    disort.f: ',6X,A15,/,5X,
-     *       '      extra.f: ',4X,A15,10X,'    k_gB16.f: ',6X,A15,/,5X,
-     *       '     k_gB17.f: ',4X,A15,10X,'    k_gB18.f: ',6X,A15,/,5X,
-     *       '     k_gB19.f: ',4X,A15,10X,'    k_gB20.f: ',6X,A15,/,5X,
-     *       '     k_gB21.f: ',4X,A15,10X,'    k_gB22.f: ',6X,A15,/,5X,
-     *       '     k_gB23.f: ',4X,A15,10X,'    k_gB24.f: ',6X,A15,/,5X,
-     *       '     k_gB25.f: ',4X,A15,10X,'    k_gB27.f: ',6X,A15,/,5X,
-     *       '     k_gB28.f: ',4X,A15,10X,'    k_gB29.f: ',6X,A15,/)
-
+ 9910 FORMAT('  Modules and versions used in this calculation:',/,/,
+     *         13(5X,a18,2X,A18,10X, a18,2X,A18,/))
       STOP
       END
 
@@ -272,22 +309,24 @@ C     Read in atmospheric profile.
       IMPLICIT DOUBLE PRECISION (V)                                      
                                                                          
       INCLUDE 	'param.f'
+      PARAMETER (MXMOL = 38)
       PARAMETER (MAXINPX=35)
       PARAMETER (MAXXSEC=4)
 C      PARAMETER (MAXPROD = MXLAY*MAXXSEC)
 
       DIMENSION ALTZ(0:MXLAY),IXTRANS(14)
+      DIMENSION SOLVAR(NBANDS)
 
       COMMON /CONTROL/  IAER, NSTR, IOUT, ISTART, IEND, ICLD,
      &                  idelm, isccos
       COMMON /CONSTANTS/FLUXFAC,HEATFAC
       COMMON /CONSTS/ PI,PLANCK,BOLTZ,CLIGHT,AVOGAD,ALOSMT,GASCON,
      *                RADCN1,RADCN2 
-      COMMON /SWPROP/   ZENITH, ALBEDO, ADJFLUX
+      COMMON /SWPROP/   ZENITH, ALBEDO, ADJFLUX(NBANDS)
       COMMON /SURFACE/  IREFLECT,SEMISS(NBANDS)
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /IFIL/     IRD,IPR,IPU,IDUM(15)
       COMMON /XSECCTRL/ NXMOL,IXINDX(MAXINPX)
@@ -358,12 +397,30 @@ C     If clouds are present, read in appropriate input file, IN_CLD_RRTM.
       IF (ICLD .EQ. 1) CALL READCLD
 
 
-      READ (IRD,9020) JULDAT, SZA
+      READ (IRD,9020) JULDAT, SZA, ISOLVAR, (SOLVAR(IB),IB=IB1,IB2)
+
       ZENITH = COS(SZA * PI / 180.)
       IF (JULDAT .EQ. 0) THEN
-         ADJFLUX = 1.
+         ADJFLUX_JD = 1.
       ELSE
-         ADJFLUX = EARTH_SUN (JULDAT)
+         ADJFLUX_JD = EARTH_SUN (JULDAT)
+      ENDIF
+
+      IF (ISOLVAR .EQ. 0) THEN
+         DO 1400 IB = IB1,IB2
+            ADJFLUX(IB) = ADJFLUX_JD
+ 1400    CONTINUE
+      ELSEIF (ISOLVAR .EQ. 1) THEN
+         DO 1450 IB=IB1,IB2
+            ADJFLUX(IB) = ADJFLUX_JD * SOLVAR(IB1)
+ 1450    CONTINUE
+      ELSEIF (ISOLVAR .EQ. 2) THEN
+         DO 1475 IB=IB1,IB2
+            ADJFLUX(IB) = ADJFLUX_JD * SOLVAR(IB)
+ 1475    CONTINUE
+      ELSE
+         PRINT *, 'ISOLVAR = ', ISOLVAR, ' NOT A VALID INPUT VALUE'
+         STOP
       ENDIF
 
       READ (IRD,9012) IEMIS, IREFLECT, (SEMISS(IB),IB=IB1,IB2)
@@ -477,7 +534,7 @@ C     Test for mixing ratio input.
  9011 FORMAT (18X,I2,29X,I1,32X,I1,1X,I1,2X,I3,4X,I1,3x,i1,i1)
  9012 FORMAT (11X,I1,2X,I1,14F5.3)
  9013 FORMAT (1X,I1,I3,I5)                                     
- 9020 format (12X, I3, 3X, F7.4)
+ 9020 format (12X, I3, 3X, F7.4, 4X, I1,14F5.3)
  9300 FORMAT (I5)
  9301 FORMAT (1X,I1)
 
@@ -693,13 +750,14 @@ c        For this aerosol, read and store optical properties
  9000 CONTINUE
       CLOSE(IRDAER)
 
- 9010 format (4x, i1)
+ 9010 format (3x, i2)
  9011 format (2x, i3, 4x, i1, 4x, i1, 4x, i1, 3f8.3)
  9012 format (2x, i3, 14f7.4)
  9013 format (14f5.3)
 
       RETURN
       END
+
 
 C************************  SUBROUTINE XSIDENT  *****************************C
 
@@ -796,34 +854,75 @@ c   use Iqbal's equation 1.2.1
 
       include 'param.f'
 
-      COMMON /HVERSN/ HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                HVDUM1(4),HVRUTL,HVREXT,
-     *                HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRRTM/    HNAMRTM,HVRRTM
+      COMMON /CVRSET/    HNAMSET,HVRSET
+      COMMON /CVRATM/    HNAMATM,HVRATM
+      COMMON /CVRUTL/    HNAMUTL,HVRUTL
+      COMMON /CVRTAU/    HNAMTAU,HVRTAU
+      COMMON /CVRCLD/    HNAMCLD,HVRCLD
+      COMMON /CVREXT/    HNAMEXT,HVREXT
+      COMMON /CVRRTR/    HNAMRTR,HVRRTR
+      COMMON /CVRRDI/    HNAMRDI,HVRRDI
+      COMMON /CVRERR/    HNAMERR,HVRERR
+      COMMON /CVRLPK/    HNAMLPK,HVRLPK
+      COMMON /CVRDIS/    HNAMDIS,HVRDIS
 
-      COMMON /HVRSNB/    HVRKG(16:29)
-
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
-
+      COMMON /CVRSN16/   HNAMKG16,HVRKG16
+      COMMON /CVRSN17/   HNAMKG17,HVRKG17
+      COMMON /CVRSN18/   HNAMKG18,HVRKG18
+      COMMON /CVRSN19/   HNAMKG19,HVRKG19
+      COMMON /CVRSN20/   HNAMKG20,HVRKG20
+      COMMON /CVRSN21/   HNAMKG21,HVRKG21
+      COMMON /CVRSN22/   HNAMKG22,HVRKG22
+      COMMON /CVRSN23/   HNAMKG23,HVRKG23
+      COMMON /CVRSN24/   HNAMKG24,HVRKG24
+      COMMON /CVRSN25/   HNAMKG25,HVRKG25
+      COMMON /CVRSN26/   HNAMKG26,HVRKG26
+      COMMON /CVRSN27/   HNAMKG27,HVRKG27
+      COMMON /CVRSN28/   HNAMKG28,HVRKG28
+      COMMON /CVRSN29/   HNAMKG29,HVRKG29
 
       COMMON /CONSTANTS/ FLUXFAC,HEATFAC
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
 
+      CHARACTER*18 HVRRTM,HVRSET,HVRATM,HVRUTL,HVRTAU,
+     *             HVRCLD,HVREXT,HVRRTR,HVRRDI,HVRERR,
+     *             HVRLPK,HVRDIS
+
+      CHARACTER*18 HNAMRTM,HNAMSET,HNAMATM,HNAMUTL,HNAMTAU,
+     *             HNAMCLD,HNAMEXT,HNAMRTR,HNAMRDI,HNAMERR,
+     *             HNAMLPK,HNAMDIS
+
+      CHARACTER*18 HNAMKG26
+
+      CHARACTER*18 HVRKG26
+
+
       DATA HVRRTM / 'NOT USED' /,  
      *     HVRRTR / 'NOT USED' /,   HVRATM / 'NOT USED' /,
      *     HVRSET / 'NOT USED' /,   HVRTAU / 'NOT USED' /,
-     *     HVDUM1 / 4*'NOT USED' /, HVRUTL / 'NOT USED' /,
+     *     HVRUTL / 'NOT USED' /,
      *     HVREXT / 'NOT USED' /, 
-     *     HVRD1M / 'NOT USED' /,   HVRR1M / 'NOT USED' /,
-     *     HVREPK / 'NOT USED' /,   HVRLPK / 'NOT USED' /,
-     *     HVRAER / 'NOT USED' /,
+     *     HVRRDI / 'NOT USED' /,
+     *     HVRERR / 'NOT USED' /,   HVRLPK / 'NOT USED' /,
      *     HVRCLD / 'NOT USED' /,
-     *     HVRDIS / 'NOT USED' /,   HVRLAM / 'NOT USED' /,
-     *     HVRPAR / 'NOT USED' /
+     *     HVRDIS / 'NOT USED' / 
+ 
+      DATA HNAMRTM / '           rrtm.f:' /,
+     *     HNAMSET / '        setcoef.f:' /,
+     *     HNAMATM / '         rrtatm.f:' /,
+     *     HNAMUTL / '       util_xxx.f:' /,
+     *     HNAMTAU / '      taumoldis.f:' /,
+     *     HNAMCLD / '        cldprop.f:' /,
+     *     HNAMEXT / '          extra.f:' /,
+     *     HNAMRTR / '         rtrdis.f:' /,
+     *     HNAMRDI / '       RDI1MACH.f:' /,
+     *     HNAMERR / '        ErrPack.f:' /,
+     *     HNAMLPK / '         LINPAK.f:' /,
+     *     HNAMDIS / '         disort.f:' /
 
+      DATA HVRKG26 / ' ' /
+      DATA HNAMKG26 / ' '/
 
       DATA WAVENUM1(16) /2600./,WAVENUM2(16) /3250./,DELWAVE(16) /650./
       DATA WAVENUM1(17) /3250./,WAVENUM2(17) /4000./,DELWAVE(17) /750./

@@ -2,14 +2,26 @@ C     path:      $Source$
 C     author:    $Author$
 C     revision:  $Revision$
 C     created:   $Date$
+C
+C  --------------------------------------------------------------------------
+C |                                                                          |
+C |  Copyright 2002, 2003, Atmospheric & Environmental Research, Inc. (AER). |
+C |  This software may be used, copied, or redistributed as long as it is    |
+C |  not sold and this copyright notice is reproduced on each copy made.     |
+C |  This model is provided as is without any express or implied warranties. |
+C |                       (http://www.rtweb.aer.com/)                        |
+C |                                                                          |
+C  --------------------------------------------------------------------------
+
       PARAMETER (MG = 16)
       REAL KA(9,5,13,MG),KB(5,5,13:59,MG)
 
-      COMMON /HVRSN28/ HVRKG28
+      COMMON /CVRSN28/ HNAMKG28,HVRKG28
       COMMON /K28/ KA ,KB
 
-      CHARACTER*15 HVRKG28
+      CHARACTER*18 HNAMKG28,HVRKG28
 
+      DATA HNAMKG28 / '        k_gb28.f:' /
       DATA HVRKG28 /'$Revision$'/
 
 C     The array KA contains absorption coefs for each of the 16 g-intervals

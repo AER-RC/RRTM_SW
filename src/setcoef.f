@@ -3,10 +3,21 @@ C     author:    $Author$
 C     revision:  $Revision$
 C     created:   $Date$
       SUBROUTINE SETCOEF
+C
+C  --------------------------------------------------------------------------
+C |                                                                          |
+C |  Copyright 2002, 2003, Atmospheric & Environmental Research, Inc. (AER). |
+C |  This software may be used, copied, or redistributed as long as it is    |
+C |  not sold and this copyright notice is reproduced on each copy made.     |
+C |  This model is provided as is without any express or implied warranties. |
+C |                       (http://www.rtweb.aer.com/)                        |
+C |                                                                          |
+C  --------------------------------------------------------------------------
 
 C     Purpose:  For a given atmosphere, calculate the indices and
 C     fractions related to the pressure and temperature interpolations.
 
+      PARAMETER (MXMOL=38)
       PARAMETER (MXLAY = 203)
       PARAMETER (MG =16)
 
@@ -16,7 +27,7 @@ c      COMMON /CONTROL/  NUMANGS, IOUT, ISTART, IEND, ICLD
      &                  idelm, isccos
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBROAD(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBROAD(MXLAY),
      &                  COLMOL(MXLAY),NMOL
 
 C  Output
@@ -31,15 +42,9 @@ C  Output
 
 C  --------
 
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRSET/   HNAMSET,HVRSET
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      CHARACTER*18 HNAMSET,HVRSET
 
       DIMENSION SELFFAC(MXLAY),SELFFRAC(MXLAY),INDSELF(MXLAY)
       DIMENSION FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)

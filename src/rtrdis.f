@@ -2,7 +2,18 @@ C     path:      $Source$
 C     author:    $Author$
 C     revision:  $Revision$
 C     created:   $Date$
+
       SUBROUTINE RTRDIS
+C
+C  --------------------------------------------------------------------------
+C |                                                                          |
+C |  Copyright 2002, 2003, Atmospheric & Environmental Research, Inc. (AER). |
+C |  This software may be used, copied, or redistributed as long as it is    |
+C |  not sold and this copyright notice is reproduced on each copy made.     |
+C |  This model is provided as is without any express or implied warranties. |
+C |                       (http://www.rtweb.aer.com/)                        |
+C |                                                                          |
+C  --------------------------------------------------------------------------
 
 C *** This program calculates the upward fluxes, downward fluxes,
 C     and heating rates for an arbitrary atmosphere.  The input to
@@ -24,7 +35,7 @@ C     per g-value per band.
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
       COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
      &                   idelm, isccos
-      COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX
+      COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX(NBANDS)
       COMMON /SURFACE/   IREFLECT,SEMISS(NBANDS)
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
@@ -32,25 +43,25 @@ C     per g-value per band.
       COMMON /PLANKG/    FRACS(MXLAY,MG)
       COMMON /TAUGCOM/   TAUG(MXLAY,MG)
       COMMON /SSAGCOM/   SSA(MXLAY,MG)
-      COMMON /AERDAT/    ssaaer(mxlay,nbands), phase(mcmu,mxlay,nbands), 
+      COMMON /AERDAT/    ssaaer(mxlay,nbands), 
+     &                   phase(mcmu,mxlay,nbands), 
      &                   tauaer(mxlay,nbands)
-      COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),TAUCLOUD(MXLAY,NBANDS),
+      COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),
+     &                   TAUCLOUD(MXLAY,NBANDS),
      &                   SSACLOUD(MXLAY,NBANDS),
      &                   XMOM(0:16,MXLAY,NBANDS),
      &                   TAUCLDORIG(MXLAY,NBANDS)
-      COMMON /OUTPUT/    TOTUFLUX(0:MXLAY), TOTDFLUX(0:MXLAY),
-     &                   DIFDOWN(0:MXLAY), DIRDOWN(0:MXLAY),
-     &                   FNET(0:MXLAY), HTR(0:MXLAY)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
-
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /OUTPUT/    TOTUFLUX(0:MXLAY,0:nbands), 
+     &                   TOTDFLUX(0:MXLAY,0:nbands),
+     &                   DIFDOWN(0:MXLAY,0:nbands), 
+     &                   DIRDOWN(0:MXLAY,0:nbands),
+     &                   FNET(0:MXLAY,0:nbands), 
+     &                   HTR(0:MXLAY,0:nbands) 
                                        
+      COMMON /CVRRTR/    HNAMRTR,HVRRTR
+
+      CHARACTER*18       HNAMRTR,HVRRTR
+
       DIMENSION BBD1(MXLAY),BBD2(MXLAY),BBD3(MXLAY)
       DIMENSION WTNUM(MXANG)
 
@@ -97,7 +108,9 @@ C     per g-value per band.
       IF (IREFLECT .EQ. 0) THEN
          LAMBER = .TRUE.
       ELSE
-         LAMBER = .FALSE.
+         PRINT *,'IREFLECT = ', IREFLECT, 
+     &        'NOT A VALID INPUT.  SET TO 0 FOR LAMBERTIAN SURFACE.'
+         STOP
       ENDIF
 
       DELTAM = .FALSE.
@@ -109,18 +122,15 @@ C     per g-value per band.
       MAXUMU = MUMU
       MAXCMU = MCMU
       MAXPHI = MPHI
-      DO 200 LAY = 0, NLAYERS
-         IF (LAY .NE. 0) THEN
-            SSALB(LAY) = 0.
-            DO 180 IQ = 0, NSTR
-               PMOM(IQ,LAY) = 0.
- 180        CONTINUE
-         ENDIF
 
-         TOTUFLUX(LAY) = 0.0
-         DIRDOWN(LAY) = 0.0
-         DIFDOWN(LAY) = 0.0
- 200  CONTINUE
+      SSALB(1:MXLAY) = 0.0
+      PMOM(0:MCMU,1:MXLAY) = 0.0
+      TOTDFLUX(0:MXLAY,0:NBANDS) = 0.0
+      TOTUFLUX(0:MXLAY,0:NBANDS) = 0.0
+      DIRDOWN(0:MXLAY,0:NBANDS) = 0.0
+      DIFDOWN(0:MXLAY,0:NBANDS) = 0.0
+      FNET(0:MXLAY,0:NBANDS) = 0.0
+      HTR(0:MXLAY,0:NBANDS) = 0.0
 
 C *** Loop over frequency bands.
       DO 6000 IBAND = ISTART, IEND
@@ -162,10 +172,11 @@ c  set albedo for this band
 
 C ***    Loop over g-channels.
          IG = 1
+
  1000    CONTINUE
 C ***    Downward radiative transfer.
          SOL = SFLUXZEN(IG)
-         FBEAM = ADJFLUX * SOL
+         FBEAM = ADJFLUX(IBAND) * SOL
          UMU0 = abs(1./SECZEN)
          DO 3900 LAY = NLAYERS, 1, -1
             FORWAER = PHASE(1,LAY,IBAND)**NSTR
@@ -176,6 +187,7 @@ C ***    Downward radiative transfer.
      &           SSAAER(LAY,IBAND))
             TAUREV(NLAYERS-LAY+1) = TAUG(LAY,IG)  + TAUDMAER +
      &           TAUCLOUD(LAY,IB)
+
             SCATAER = SSADMAER * TAUDMAER
             SCATRAY = SSA(LAY,IG) * TAUG(LAY,IG)
             SCATCLD = SSACLOUD(LAY,IB) * TAUCLOUD(LAY,IB)
@@ -184,7 +196,7 @@ C ***    Downward radiative transfer.
             IF (SSALB(NLAYERS-LAY+1) .GT. 1.0) THEN
                PRINT*,'WARNING SSALB > 1.0, LAYER ',LAY,
      &              SSALB(NLAYERS-LAY+1)
-           ENDIF
+            ENDIF
             PMOM(0,NLAYERS-LAY+1) = 1.
             PHAER1 = PHMULT * (PHASE(1,LAY,IBAND) - FORWAER)
             PMOM(1,NLAYERS-LAY+1) = (SCATAER * PHAER1 +
@@ -200,15 +212,18 @@ C ***    Downward radiative transfer.
      &              SCATCLD*XMOM(K,LAY,IB))/ 
      &              (SCATAER + SCATRAY + SCATCLD)
  3850       CONTINUE
+
  3900    CONTINUE
-         CALL DISORT( NLAYERS, TAUREV, SSALB, PMOM, TEMPER, WVNMLO,
-     &                   WVNMHI, USRTAU, NTAU, UTAU, NSTR, USRANG, NUMU,
-     &                   UMU, NPHI, PHI, IBCND, FBEAM, UMU0, PHI0,
-     &                   FISOT,LAMBER, ALBEDO, HL, BTEMP, TTEMP, TEMIS,
-     &                   DELTAM, sccos, PLANK, ONLYFL, ACCUR, PRNT, 
-     &                   HEADER, MAXCLY, MAXULV, MAXUMU, MAXCMU, MAXPHI, 
-     &                   RFLDIR, RFLDN, FLUP, fldir, fldn, dirscale,
-     &                   DFDT, UAVG, UU, U0U, ALBMED, TRNMED )
+
+         CALL DISORT( NLAYERS, TAUREV, SSALB, NSTR, PMOM, 
+     &        TEMPER, WVNMLO, WVNMHI, USRTAU, NTAU, UTAU, NSTR, 
+     &        USRANG, NUMU, UMU, NPHI, PHI, IBCND, FBEAM, 
+     &        UMU0, PHI0, FISOT, LAMBER, ALBEDO, BTEMP, TTEMP, 
+     &        TEMIS, DELTAM,sccos, PLANK, ONLYFL, ACCUR, PRNT, 
+     &        HEADER, MAXCLY, MAXULV, MAXUMU, MAXPHI, MAXCMU,
+     &        RFLDIR, RFLDN, FLUP, fldir, fldn, dirscale,
+     &        DFDT, UAVG, UU, ALBMED, TRNMED )
+
          DO 3950 LEV = NLAYERS, 0, -1
 C     Sum up either actual downward fluxes (IDELM=0) or delta-M scaled
 C     downward fluxes.  Since the delta-M scaling is being handled 
@@ -226,31 +241,74 @@ C     unscaled fluxes.
                   TRANS = EXP(-TAUORIG/UMU0)
                   DIRFLUX = DIRFLUX * TRANS
                ENDIF
-               DIRDOWN(LEV) = DIRDOWN(LEV) + DIRFLUX
-               DIFDOWN(LEV) = DIFDOWN(LEV) + (TOTDFLX - DIRFLUX)
+               DIRDOWN(LEV,IBAND) = DIRDOWN(LEV,IBAND) + DIRFLUX
+               DIFDOWN(LEV,IBAND) = DIFDOWN(LEV,IBAND) + 
+     &              (TOTDFLX - DIRFLUX)
             ELSE
-               DIRDOWN(LEV) = DIRDOWN(LEV) + FLDIR(NLAYERS-LEV+1)
-               DIFDOWN(LEV) = DIFDOWN(LEV) + FLDN(NLAYERS-LEV+1)
+               DIRDOWN(LEV,IBAND) = DIRDOWN(LEV,IBAND) + 
+     &              FLDIR(NLAYERS-LEV+1)
+               DIFDOWN(LEV,IBAND) = DIFDOWN(LEV,IBAND) + 
+     &              FLDN(NLAYERS-LEV+1)
             ENDIF
-            TOTUFLUX(LEV) = TOTUFLUX(LEV) + FLUP(NLAYERS-LEV+1)
+            TOTUFLUX(LEV,IBAND) = TOTUFLUX(LEV,IBAND) + 
+     &           FLUP(NLAYERS-LEV+1)
  3950    CONTINUE
 
          IG = IG + 1
          IF (IG .LE. NG(IBAND)) GO TO 1000
+
  6000 CONTINUE
 
-      DIFDOWN(NLAYERS) = 0.
-      IF (ISCCOS .EQ. 2) DIRDOWN(NLAYERS) = DIRDOWN(NLAYERS)/DIRSCALE
-      TOTDFLUX(NLAYERS) = DIRDOWN(NLAYERS)
-      FNET(NLAYERS) = TOTDFLUX(NLAYERS) - TOTUFLUX(NLAYERS)
-      HTR(NLAYERS) = 0.
-      DO 3951 LEV = NLAYERS-1, 0, -1
-         IF (ISCCOS .EQ. 2) DIRDOWN(LEV) =  DIRDOWN(LEV)/DIRSCALE
-         TOTDFLUX(LEV) =  DIRDOWN(LEV) + DIFDOWN(LEV)
-         FNET(LEV) = TOTDFLUX(LEV) - TOTUFLUX(LEV)
-         HTR(LEV) = -HEATFAC * (FNET(LEV) -FNET(LEV+1)) /
-     &        (PZ(LEV) - PZ(LEV+1))
- 3951 CONTINUE
+c     User requires output from only one band or from all bands
+      IF (IOUT .GT. 0) THEN
+         DO 3952 IBAND=ISTART,IEND
+            DIFDOWN(NLAYERS,IBAND) = 0.
+            IF (ISCCOS .EQ. 2) DIRDOWN(NLAYERS,IBAND) = 
+     &        DIRDOWN(NLAYERS,IBAND)/DIRSCALE
+            TOTDFLUX(NLAYERS,IBAND) = DIRDOWN(NLAYERS,IBAND)
+            FNET(NLAYERS,IBAND) = TOTDFLUX(NLAYERS,IBAND) -
+     &           TOTUFLUX(NLAYERS,IBAND)
+            HTR(NLAYERS,IBAND) = 0.0
+            DO 3951 LEV = NLAYERS-1,0,-1
+               IF (ISCCOS .EQ. 2) DIRDOWN(LEV,IBAND) = 
+     &              DIRDOWN(LEV,IBAND)/DIRSCALE
+               TOTDFLUX(LEV,IBAND) = DIFDOWN(LEV,IBAND) +
+     &              DIRDOWN(LEV,IBAND)
+               FNET(LEV,IBAND) = TOTDFLUX(LEV,IBAND) -
+     &              TOTUFLUX(LEV,IBAND)
+               HTR(LEV,IBAND) = -HEATFAC * 
+     &              (FNET(LEV,IBAND) -FNET(LEV+1,IBAND)) /
+     &              (PZ(LEV) - PZ(LEV+1))
+ 3951       CONTINUE
+ 3952    CONTINUE
+      ENDIF
+
+c     User requires output from only the broadband
+      IF (IOUT .EQ. 0 .OR. IOUT .EQ. 98) THEN
+         DIFDOWN(NLAYERS,0:NBANDS) = 0.
+         DIRDOWN(NLAYERS,0) = SUM(DIRDOWN(NLAYERS,ISTART:IEND))
+         IF (ISCCOS .EQ. 2)  DIRDOWN(NLAYERS,0) = 
+     &        DIRDOWN(NLAYERS,0)/DIRSCALE
+         TOTDFLUX(NLAYERS,0) = DIRDOWN(NLAYERS,0)
+         TOTUFLUX(NLAYERS,0) = SUM(TOTUFLUX(NLAYERS,ISTART:IEND))
+         FNET(NLAYERS,0) = TOTDFLUX(NLAYERS,0) - TOTUFLUX(NLAYERS,0)
+         HTR(NLAYERS,0) = 0.0
+         DO 3953 LEV = NLAYERS-1,0,-1
+            TOTUFLUX(LEV,0) = SUM(TOTUFLUX(LEV,ISTART:IEND))
+            DIRDOWN(LEV,0) = SUM(DIRDOWN(LEV,ISTART:IEND))
+            IF (ISCCOS .EQ. 2) DIRDOWN(LEV,0) = 
+     &           DIRDOWN(LEV,0)/DIRSCALE
+            DIFDOWN(LEV,0) = SUM(DIFDOWN(LEV,ISTART:IEND))
+            TOTDFLUX(LEV,0) = DIFDOWN(LEV,0) + DIRDOWN(LEV,0)
+            FNET(LEV,0) = TOTDFLUX(LEV,0) - TOTUFLUX(LEV,0)
+            HTR(LEV,0) = -HEATFAC * 
+     &           (FNET(LEV,0) -FNET(LEV+1,0)) /
+     &           (PZ(LEV) - PZ(LEV+1))
+ 3953    CONTINUE
+      ENDIF
 
       RETURN
       END   
+
+
+

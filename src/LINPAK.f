@@ -1,6 +1,49 @@
 C     path:      $Source$
 C     revision:  $Revision$
 C     created:   $Date$
+
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+c This module is part of the DISORT package, Version 2.0.  See
+c DISORT.f for additional information.  It has been modified by AER
+c to contain a CVS revision number variable, printed in RRTM output
+c files.
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+c RCS version control information:
+c $Header$
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+c Call tree:
+c
+c    SGBCO
+c       SASUM
+c       SDOT
+c       SAXPY
+c       SGBFA
+c           ISAMAX
+c           SAXPY
+c           SSCAL
+c       SSCAL
+c   SGBSL
+c       SDOT
+c       SAXPY
+c   SGECO
+c       SASUM
+c       SDOT
+c       SAXPY
+c       SGEFA
+c           ISAMAX
+c           SAXPY
+c           SSCAL
+c       SSCAL
+c   SGESL
+c       SDOT
+c       SAXPY
+c   SSWAP
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
       SUBROUTINE SGBCO( ABD, LDA, N, ML, MU, IPVT, RCOND, Z )
 
 c         Factors a real band matrix by Gaussian elimination
@@ -107,9 +150,6 @@ c            * 12 23 34 45 56
 c           11 22 33 44 55 66
 c           21 32 43 54 65  *
 
-
-c     Routines called:  from LINPACK: SGBFA
-c                       from BLAS:    SAXPY, SDOT, SSCAL, SASUM
 c --------------------------------------------------------------------
 
 
@@ -143,7 +183,7 @@ c     .. Intrinsic Functions ..
 c     ..
 
 
-c                       ** compute 1-norm of a
+c                       ** compute 1-norm of A
       ANORM  = 0.0E0
       L  = ML + 1
       IS = L + MU
@@ -163,14 +203,14 @@ c                                               ** factor
 
       CALL SGBFA( ABD, LDA, N, ML, MU, IPVT, INFO )
 
-c     RCOND = 1/(norm(a)*(estimate of norm(inverse(a)))) .
-c     estimate = norm(z)/norm(y) where  a*z = y  and  trans(a)*y = e .
-c     trans(a)  is the transpose of a .  The components of  e  are
-c     chosen to cause maximum local growth in the elements of w  where
-c     trans(u)*w = e .  The vectors are frequently rescaled to avoid
+c     RCOND = 1/(norm(A)*(estimate of norm(inverse(A)))) .
+c     estimate = norm(Z)/norm(Y) where  A*Z = Y  and  trans(A)*Y = E.
+c     trans(A) is the transpose of A.  The components of E  are
+c     chosen to cause maximum local growth in the elements of W  where
+c     trans(U)*W = E.  The vectors are frequently rescaled to avoid
 c     overflow.
 
-c                     ** solve trans(u)*w = e
+c                     ** solve trans(U)*W = E
       EK = 1.0E0
 
       DO 20 J = 1, N
@@ -249,7 +289,7 @@ c                     ** solve trans(u)*w = e
 
       CALL SSCAL( N, S, Z, 1 )
 
-c                         ** solve trans(l)*y = w
+c                         ** solve trans(L)*Y = W
       DO 60 KB = 1, N
          K  = N + 1 - KB
          LM = MIN( ML, N - K )
@@ -278,7 +318,7 @@ c                         ** solve trans(l)*y = w
       CALL SSCAL( N, S, Z, 1 )
 
       YNORM  = 1.0E0
-c                         ** solve l*v = y
+c                         ** solve L*V = Y
       DO 70 K = 1, N
 
          L      = IPVT( K )
@@ -309,7 +349,7 @@ c                         ** solve l*v = y
 
       YNORM  = S*YNORM
 
-c                           ** solve  u*z = w
+c                           ** solve  U*Z = W
       DO 80 KB = 1, N
 
          K  = N + 1 - KB
@@ -373,7 +413,6 @@ c                     indication of singularity.
 
 c     (see SGBCO for description of band storage mode)
 
-c     Routines called:  from BLAS:    SAXPY, SSCAL, ISAMAX
 c ----------------------------------------------------------------
 
 
@@ -552,7 +591,6 @@ c           do 10 j = 1, p
 c              call sgbsl(abd,lda,n,ml,mu,ipvt,c(1,j),0)
 c        10 continue
 
-c     Routines called:  from BLAS:    SAXPY, SDOT
 c --------------------------------------------------------
 
 c     .. Scalar Arguments ..
@@ -588,9 +626,9 @@ c     ..
       NM1 = N - 1
 
       IF( JOB.EQ.0 ) THEN
-c                           ** solve  a * x = b
+c                           ** solve  A * X = B
 
-c                               ** first solve l*y = b
+c                               ** first solve L*Y = B
          IF( ML.NE.0 ) THEN
 
             DO 10 K = 1, NM1
@@ -612,7 +650,7 @@ c                               ** first solve l*y = b
 
          END IF
 
-c                           ** now solve  u*x = y
+c                           ** now solve  U*X = Y
          DO 20 KB = 1, N
 
             K      = N + 1 - KB
@@ -628,9 +666,9 @@ c                           ** now solve  u*x = y
 
 
       ELSE
-c                          ** solve  trans(a) * x = b
+c                          ** solve  trans(A) * X = B
 
-c                                  ** first solve  trans(u)*y = b
+c                                  ** first solve  trans(U)*Y = B
          DO 30 K = 1, N
 
             LM     = MIN( K, M ) - 1
@@ -641,15 +679,15 @@ c                                  ** first solve  trans(u)*y = b
 
    30    CONTINUE
 
-c                                  ** now solve trans(l)*x = y
+c                                  ** now solve trans(L)*X = Y
          IF( ML.NE.0 ) THEN
 
             DO 40 KB = 1, NM1
 
                K      = N - KB
                LM     = MIN( ML, N - K )
-               B( K ) = B( K ) + SDOT( LM, ABD( M + 1,K ), 1,
-     &                                 B( K + 1 ), 1 )
+               B( K ) = B( K ) + SDOT( LM, ABD( M+1, K ), 1,
+     &                                 B( K+1 ), 1 )
                L      = IPVT( K )
 
                IF( L.NE.K ) THEN
@@ -719,8 +757,6 @@ c                If  A  is close to a singular matrix, then  Z  is
 c                an approximate null vector in the sense that
 c                norm(A*Z) = RCOND*norm(A)*norm(Z) .
 
-c     Routines called:  from LINPACK: SGEFA
-c                       from BLAS:    SAXPY, SDOT, SSCAL, SASUM
 c ------------------------------------------------------------------
 
 c     .. Scalar Arguments ..
@@ -762,14 +798,14 @@ c                                      ** factor
 
       CALL SGEFA( A, LDA, N, IPVT, INFO )
 
-c     RCOND = 1/(norm(a)*(estimate of norm(inverse(a)))) .
-c     estimate = norm(z)/norm(y) where  a*z = y  and  trans(a)*y = e .
-c     trans(a)  is the transpose of a .  The components of  e  are
-c     chosen to cause maximum local growth in the elements of w  where
-c     trans(u)*w = e .  The vectors are frequently rescaled to avoid
+c     RCOND = 1/(norm(A)*(estimate of norm(inverse(A)))) .
+c     estimate = norm(Z)/norm(Y) where  A*Z = Y  and  trans(A)*Y = E .
+c     trans(A) is the transpose of A.  The components of E  are
+c     chosen to cause maximum local growth in the elements of W  where
+c     trans(U)*W = E.  The vectors are frequently rescaled to avoid
 c     overflow.
 
-c                        ** solve trans(u)*w = e
+c                        ** solve trans(U)*W = E
       EK = 1.0E0
 
       DO 20 J = 1, N
@@ -839,7 +875,7 @@ c                        ** solve trans(u)*w = e
       S  = 1.0E0 / SASUM( N, Z, 1 )
 
       CALL SSCAL( N, S, Z, 1 )
-c                                ** solve trans(l)*y = w
+c                                ** solve trans(L)*Y = W
       DO 60 KB = 1, N
          K  = N + 1 - KB
 
@@ -864,7 +900,7 @@ c                                ** solve trans(l)*y = w
       S  = 1.0E0 / SASUM( N, Z, 1 )
 
       CALL SSCAL( N, S, Z, 1 )
-c                                 ** solve l*v = y
+c                                 ** solve L*V = Y
       YNORM  = 1.0E0
 
       DO 70 K = 1, N
@@ -891,7 +927,7 @@ c                                 ** solve l*v = y
       S  = 1.0E0 / SASUM( N, Z, 1 )
 
       CALL SSCAL( N, S, Z, 1 )
-c                                  ** solve  u*z = v
+c                                  ** solve  U*Z = V
       YNORM  = S*YNORM
 
       DO 80 KB = 1, N
@@ -954,7 +990,6 @@ c                     indicate that SGESL or SGEDI will divide by zero
 c                     if called.  Use  RCOND  in SGECO for a reliable
 c                     indication of singularity.
 
-c     Routines called:  from BLAS:    SAXPY, SSCAL, ISAMAX
 c ---------------------------------------------------------------------
 
 c     .. Scalar Arguments ..
@@ -1090,7 +1125,6 @@ c           do 10 j = 1, p
 c              call sgesl(a,lda,n,ipvt,c(1,j),0)
 c        10 continue
 
-c     Routines called:  from BLAS:    SAXPY, SDOT
 c ---------------------------------------------------------------------
 
 c     .. Scalar Arguments ..
@@ -1117,23 +1151,18 @@ c     .. External Subroutines ..
       EXTERNAL  SAXPY
 c     ..
 
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRLPK/    HNAMLPK,HVRLPK
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      CHARACTER*18       HNAMLPK,HVRLPK
 
       HVRLPK = '$Revision$'
+
       NM1  = N - 1
 
       IF( JOB.EQ.0 ) THEN
-c                                 ** solve  a * x = b
+c                                 ** solve  A * X = B
 
-c                                     ** first solve  l*y = b
+c                                     ** first solve  L*Y = B
          DO 10 K = 1, NM1
 
             L  = IPVT( K )
@@ -1149,7 +1178,7 @@ c                                     ** first solve  l*y = b
             CALL SAXPY( N - K, T, A( K+1, K ), 1, B( K+1 ), 1 )
 
    10    CONTINUE
-c                                    ** now solve  u*x = y
+c                                    ** now solve  U*X = Y
          DO 20 KB = 1, N
 
             K      = N + 1 - KB
@@ -1162,9 +1191,9 @@ c                                    ** now solve  u*x = y
 
 
       ELSE
-c                         ** solve  trans(a) * x = b
+c                         ** solve  trans(A) * X = B
 
-c                                    ** first solve  trans(u)*y = b
+c                                    ** first solve  trans(U)*Y = B
          DO 30 K = 1, N
 
             T      = SDOT( K - 1, A( 1,K ), 1, B( 1 ), 1 )
@@ -1650,3 +1679,4 @@ c     ..
       END IF
 
       END
+

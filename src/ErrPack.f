@@ -1,30 +1,37 @@
 C     path:      $Source$
 C     revision:  $Revision$
 C     created:   $Date$
+
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+c This module is part of the DISORT package, Version 2.0.  See
+c DISORT.f for additional information.  It has been modified by AER
+c to contain a CVS revision number variable, printed in RRTM output
+c files.
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+c RCS version control information:
+c $Header$
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
       SUBROUTINE  ErrMsg( MESSAG, FATAL )
 
 c        Print out a warning or error message;  abort if error
-c        after making symbolic dump (machine-specific)
 
-      LOGICAL       FATAL, MsgLim, Cray
+      LOGICAL       FATAL, MsgLim
       CHARACTER*(*) MESSAG
       INTEGER       MaxMsg, NumMsg
       SAVE          MaxMsg, NumMsg, MsgLim
       DATA NumMsg / 0 /,  MaxMsg / 100 /,  MsgLim / .FALSE. /
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      
+      COMMON /CVRERR/    HNAMERR,HVRERR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      CHARACTER*18 HNAMERR,HVRERR
 
-      HVREPK = '$Revision$'
+      HVRERR = '$Revision$'
 
       IF ( FATAL )  THEN
-         WRITE ( *, '(//,2A,//)' )  ' ******* ERROR >>>>>>  ', MESSAG
+         WRITE ( *, '(/,2A,/)' )  ' ******* ERROR >>>>>>  ', MESSAG
          STOP
       END IF
 
@@ -41,7 +48,7 @@ c        after making symbolic dump (machine-specific)
       RETURN
 
    99 FORMAT( //,' >>>>>>  TOO MANY WARNING MESSAGES --  ',
-     $   'They will no longer be printed  <<<<<<<', // )
+     &   'They will no longer be printed  <<<<<<<', // )
       END
 
       LOGICAL FUNCTION  WrtBad ( VarNam )
@@ -60,9 +67,10 @@ c                         ( CHARACTER, any length )
       WrtBad = .TRUE.
       NumMsg = NumMsg + 1
       WRITE ( *, '(3A)' )  ' ****  Input variable  ', VarNam,
-     $                     '  in error  ****'
+     &                     '  in error  ****'
       IF ( NumMsg.EQ.MaxMsg )
-     $   CALL  ErrMsg ( 'Too many input errors.  Aborting...', .TRUE. )
+     &   CALL  ErrMsg ( 'Too many input errors.  Aborting...', .TRUE. )
+
       RETURN
       END
 
@@ -80,9 +88,10 @@ c                        increased (at least)
       INTEGER        MinVal
 
 
-      WRITE ( *, '(3A,I7)' )  ' ****  Symbolic dimension  ', DimNam,
-     $                     '  should be increased to at least ', MinVal
+      WRITE ( *, '(/,3A,I7)' )  ' ****  Symbolic dimension  ', DimNam,
+     &                     '  should be increased to at least ', MinVal
       WrtDim = .TRUE.
+
       RETURN
       END
 
@@ -97,7 +106,9 @@ c       percent error from the correct value;  return  'FALSE'.
 
       TstBad = .FALSE.
       WRITE( *, '(/,3A,1P,E11.2,A)' )
-     $       ' Output variable ', VarNam,' differed by ', 100.*RelErr,
-     $       ' per cent from correct value.  Self-test failed.'
+     &       ' Output variable ', VarNam,' differed by ', 100.*RelErr,
+     &       ' per cent from correct value.  Self-test failed.'
+
       RETURN
       END
+

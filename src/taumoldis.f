@@ -2,6 +2,18 @@ C     path:      $Source$
 C     author:    $Author$
 C     revision:  $Revision$
 C     created:   $Date$
+
+C
+C  --------------------------------------------------------------------------
+C |                                                                          |
+C |  Copyright 2002, 2003, Atmospheric & Environmental Research, Inc. (AER). |
+C |  This software may be used, copied, or redistributed as long as it is    |
+C |  not sold and this copyright notice is reproduced on each copy made.     |
+C |  This model is provided as is without any express or implied warranties. |
+C |                       (http://www.rtweb.aer.com/)                        |
+C |                                                                          |
+C  --------------------------------------------------------------------------
+
 *******************************************************************************
 *                                                                             *
 *                  Optical depths developed for the                           *
@@ -122,7 +134,7 @@ C     created:   $Date$
 
 C     BAND 16:  2600-3250 cm-1 (low - H2O,CH4; high - CH4)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -137,7 +149,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -150,15 +162,10 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K16/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
 
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG)
 
@@ -253,7 +260,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 17:  3250-4000 cm-1 (low - H2O,CO2; high - H2O,CO2)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -268,7 +275,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -282,15 +289,10 @@ C  Input
       COMMON /K17/      KA(9,5,13,MG),KB(5,5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(4,MG)
 
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(585,MG),ABSB(1175,MG),SFLUXREF(MG,5)
 
 C     Rayleigh extinction coefficient at v = 3625 cm-1.
@@ -422,7 +424,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 18:  4000-4650 cm-1 (low - H2O,CH4; high - CH4)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -437,7 +439,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -450,15 +452,11 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K18/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG,9)
 
 C     Rayleigh extinction coefficient at v = 4325 cm-1.
@@ -583,7 +581,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 19:  4650-5150 cm-1 (low - H2O,CO2; high - CO2)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -598,7 +596,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -611,15 +609,11 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K19/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG,9)
 
 C     Rayleigh extinction coefficient at v = 4900 cm-1.
@@ -746,7 +740,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 20:  5150-6150 cm-1 (low - H2O; high - H2O)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -761,7 +755,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -774,15 +768,11 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K20/      KA(5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(4,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(65,MG), ABSB(235,MG), SFLUXREF(MG), ABSCH4(MG)
 
 C     Rayleigh extinction coefficient at v = 5670 cm-1.
@@ -867,7 +857,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 21:  6150-7700 cm-1 (low - H2O,CO2; high - H2O,CO2)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -882,7 +872,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -895,15 +885,11 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K21/      KA(9,5,13,MG),KB(5,5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(4,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(585,MG),ABSB(1175,MG),SFLUXREF(MG,9)
 
 C     Rayleigh extinction coefficient at v = 6925 cm-1.
@@ -1051,7 +1037,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 22:  7700-8050 cm-1 (low - H2O,O2; high - O2)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -1066,7 +1052,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -1079,15 +1065,11 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K22/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG,9)
 
 C     Rayleigh extinction coefficient at v = 8000 cm-1.
@@ -1220,7 +1202,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 23:  8050-12850 cm-1 (low - H2O; high - nothing)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -1235,7 +1217,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -1247,15 +1229,11 @@ C  Input
       COMMON /SELF/     SELFFAC(MXLAY), SELFFRAC(MXLAY), INDSELF(MXLAY)
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K23/      KA(5,13,MG),SELFREF(10,MG),FORREF(3,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(65,MG), SFLUXREF(MG), RAYL(MG)
 
       DATA RAYL/
@@ -1322,7 +1300,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 24:  12850-16000 cm-1 (low - H2O,O2; high - O2)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -1337,7 +1315,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -1350,15 +1328,11 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K24/      KA(9,5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(3,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(585,MG), ABSB(235,MG), SFLUXREF(MG,9)
       DIMENSION ABSO3A(MG), ABSO3B(MG), RAYLA(MG,9), RAYLB(MG)
 
@@ -1539,7 +1513,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 25:  16000-22650 cm-1 (low - H2O; high - nothing)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -1554,7 +1528,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -1564,15 +1538,11 @@ C  Input
      &                  FAC10(MXLAY),FAC11(MXLAY)                             
       COMMON /INTIND/   JP(MXLAY),JT(MXLAY),JT1(MXLAY)
       COMMON /K25/      KA(5,13,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(65,MG), SFLUXREF(MG),RAYL(MG)
       DIMENSION ABSO3A(MG), ABSO3B(MG)
 
@@ -1646,7 +1616,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 26:  22650-29000 cm-1 (low - nothing; high - nothing)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -1661,7 +1631,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -1670,15 +1640,11 @@ C  Input
       COMMON /INTFAC/   FAC00(MXLAY),FAC01(MXLAY),                            
      &                  FAC10(MXLAY),FAC11(MXLAY)                             
       COMMON /INTIND/   JP(MXLAY),JT(MXLAY),JT1(MXLAY)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
 
       DIMENSION SFLUXREF(MG),RAYL(MG)
 
@@ -1724,7 +1690,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 27:  29000-38000 cm-1 (low - O3; high - O3)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -1739,7 +1705,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -1751,15 +1717,11 @@ C  Input
       COMMON /SELF/     SELFFAC(MXLAY), SELFFRAC(MXLAY), INDSELF(MXLAY)
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K27/      KA(5,13,MG),KB(5,13:59,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
 
       DIMENSION ABSA(65,MG), ABSB(235,MG), SFLUXREF(MG)
       DIMENSION RAYL(MG)
@@ -1834,7 +1796,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 28:  38000-50000 cm-1 (low - O3,O2; high - O3,O2)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -1849,7 +1811,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -1861,15 +1823,11 @@ C  Input
       COMMON /SELF/     SELFFAC(MXLAY), SELFFRAC(MXLAY), INDSELF(MXLAY)
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K28/      KA(9,5,13,MG),KB(5,5,13:59,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(585,MG), ABSB(1175,MG), SFLUXREF(MG,5)
       data rayl /2.02e-5/
       DATA SFLUXREF/
@@ -1983,7 +1941,7 @@ C----------------------------------------------------------------------------
 
 C     BAND 29:  820-2600 cm-1 (low - H2O; high - CO2)
 
-      PARAMETER (MG=16, MXLAY=203, NBANDS=14)
+      PARAMETER (MG=16, MXLAY=203, NBANDS=14, MXMOL=38)
 
 C  Output
 
@@ -1998,7 +1956,7 @@ C  Input
       COMMON /PRECISE/  ONEMINUS
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
-      COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBRODL(MXLAY),
+      COMMON /SPECIES/  COLDRY(MXLAY),WKL(MXMOL,MXLAY),WBRODL(MXLAY),
      &                  COLMOL(MXLAY),NMOL
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
@@ -2011,15 +1969,11 @@ C  Input
       COMMON /FOREIGN/  FORFAC(MXLAY), FORFRAC(MXLAY), INDFOR(MXLAY)
       COMMON /K29/      KA(5,13,MG),KB(5,13:59,MG),SELFREF(10,MG),
      &                  FORREF(4,MG)
-      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT,
-     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT,
-     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
-     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+      COMMON /CVRTAU/   HNAMTAU,HVRTAU
+
+      CHARACTER*18      HNAMTAU,HVRTAU
+
       DIMENSION ABSA(65,MG), ABSB(235,MG), SFLUXREF(MG)
       DIMENSION ABSH2O(MG), ABSCO2(MG)
 
