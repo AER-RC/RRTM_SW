@@ -10,7 +10,7 @@ C     created:   $Date$
       COMMON /HVRSN16/ HVRKG16
       COMMON /K16/    KA,KB,SELFREF,FORREF
 
-      CHARACTER*15 HVRSN16
+      CHARACTER*15 HVRKG16
 
       DATA HVRKG16 /'$Revision$'/
 
