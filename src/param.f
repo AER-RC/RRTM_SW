@@ -1,3 +1,8 @@
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
+
 	parameter (mxlay = 203, nbands = 29)
 	parameter (ib1 = 16, ib2 = 29)
         parameter (mg = 16)
