@@ -14,7 +14,7 @@ FC = f90
 FCFLAG =  -fast -xtypemap=real:64,double:64,integer:64
 OUTPUT = rrtm_sw_$(PLATFORM)_$(VERSION)
 CPATH = src
-CDOTO = $(PLATFORM)_$(FC)_sgl.o
+CDOTO = $(PLATFORM)_$(FC)_dbl.o
     
 CRTM = rrtm
 CSET = setcoef

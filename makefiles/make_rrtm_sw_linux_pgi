@@ -14,7 +14,7 @@ FC = pgf90
 FCFLAG =  -fast -r8 -i8
 OUTPUT = rrtm_sw_$(PLATFORM)_$(VERSION)
 CPATH = src
-CDOTO = $(PLATFORM)_$(FC)_sgl.o
+CDOTO = $(PLATFORM)_$(FC)_dbl.o
     
 CRTM = rrtm
 CSET = setcoef
