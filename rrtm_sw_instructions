@@ -1,3 +1,13 @@
+C
+C  --------------------------------------------------------------------------
+C |                                                                          |
+C |  Copyright 2002, 2003, Atmospheric & Environmental Research, Inc. (AER). |
+C |  This software may be used, copied, or redistributed as long as it is    |
+C |  not sold and this copyright notice is reproduced on each copy made.     |
+C |  This model is provided as is without any express or implied warranties. |
+C |                       (http://www.rtweb.aer.com/)                        |
+C |                                                                          |
+C  --------------------------------------------------------------------------
 
 
 
@@ -8,7 +18,7 @@
 
                            USER INSTRUCTIONS FOR RRTM_SW
  
-                                   April 2002
+                                   April 2004
 
 
 
@@ -92,11 +102,11 @@
 
  RECORD 1.2.1  
 
-           JULDAT,      SZA
+           JULDAT,      SZA, ISOLVAR, (SOLVAR(IB),IB=16,29)
 
-            13-15,    17-20
+            13-15,    19-25,     30, 31 - 121
 
-        12X,   I3, 3X, F7.4
+        12X,   I3, 3X, F7.4, 4X, I1, 14F5.3
 
 	
         JULDAT       Julian day associated with calculation (1-365/366 starting January 1).
@@ -105,6 +115,20 @@
 
         SZA          Solar zenith angle in degrees (0 deg is overhead).
 
+        ISOLVAR      Solar variability option
+
+		     = 0 each band uses standard solar source function, corresponding
+                         to present day conditions.
+
+		     = 1 scale solar source function, each band will have the same
+                         scale factor applied, (equal to SOLVAR(16))
+
+		     = 2 scale solar source function, each band has different scale
+	 	         factors (for band IB, equal to SOLVAR(IB))
+
+	SOLVAR       the solar source function scale factor for each band.  If 
+	             ISOLVAR = 1, only the first value of SOLVAR (SOLVAR(16)) is 
+                     considered.  If ISOLVAR = 2, values must be provided for all bands.
  
  RECORD 1.4  
   
@@ -124,7 +148,7 @@
 			is equal at all angles
                   = 1 for specular reflection at surface, i.e. reflected radiance at angle
 			is equal to downward surface radiance at same angle multiplied by
-			the reflectance
+			the reflectance.  THIS OPTION CURRENTLY NOT IMPLEMENTED.
 
          SEMISS   the surface emissivity for each band (see Table I).  All values must be 
                   greater than 0 and less than or equal to 1.  If IEMIS = 1, only
@@ -568,7 +592,12 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
                        is also needed.  If ICEFLAG = 1, generalized effective size is
 		       is also needed.
 
-            ICEFLAG = 3 the optical depths are computed by a method based on the parameterization
+            ICEFLAG = 2 the optical properties are computed by a method based on the parameterization
+                        of spherical ice particles in the RT code, STREAMER v3.0 (Reference: 
+                        Key. J., Streamer User's Guide, Cooperative Institute for
+                        Meteorological Satellite Studies, 2001, 96 pp.).
+
+		    = 3 the optical properties are computed by a method based on the parameterization
 			of ice clouds due to Q. Fu, J. Clim., 9, 2058 (1996).
 
             LIQFLAG = 1 the optical depths (non-gray) due to water clouds are computed by a method
@@ -651,9 +680,16 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
             FRACICE    (INFLAG = 2) fraction of the layer's cloud water path in the form
                        of ice particles  
 
-            EFFSIZEICE  (INFLAG = 2 and ICEFLAG = 3) Generalized effective size of 
+            EFFSIZEICE (INFLAG = 2 and ICEFLAG = 2) Effective radius of spherical  
+	               ice crystals, re (see STREAMER manual for defition of this parameter)
+	               Valid sizes are 5.0 - 131.0 microns. 
+                  
+                       (INFLAG = 2 and ICEFLAG = 3) Generalized effective size of hexagonal
 	               ice crystals, dge (see Q. Fu, 1996, for definition of this parameter)
-	               Valid sizes are 5.0 - 140.0 microns.
+	               Valid sizes are 5.0 - 140.0 microns.  
+
+		       NOTE: The size descriptions for the two iceflag options are NOT
+		       equivalent.  See the particular references for the appropriate definition.
 
             EFFSIZELIQ  (INFLAG = 2 and LIQFLAG = 1) liquid droplet effective radius, re (microns) 
                        Valid sizes are 2.5 - 60.0 microns.
@@ -671,9 +707,9 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
 
              5
 
-        4X, I1
+        3X, I2
  
-      NAER   number of different aerosol types (maximum of 4).  An aerosol type is characterized by a specified 
+      NAER   number of different aerosol types (maximum of 99).  An aerosol type is characterized by a specified 
              spectral dependence of aerosol optical depth, single-scattering albedo, and phase function; a change
              to any of these quantities requires a new aerosol type.  Each aerosol type requires the presence of 
              Records A2.1 - A2.3.
@@ -685,7 +721,7 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
 
              5,     10,     15,     20,              21-44 
 
-        4X, I1, 4X, I1, 4X, I1, 4X, I1,              3F8.2
+        3X, I2, 4X, I1, 4X, I1, 4X, I1,              3F8.2
 
       NLAY   number of layers containing the aerosol with the specified properties:  spectral dependence of aerosol 
              optical depth (IAOD,AERPAR), single-scattering albedo (ISSA, SSA), and phase function (IPHA,PHASE).
