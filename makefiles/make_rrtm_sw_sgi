@@ -1,62 +1,195 @@
+# $Id$
+# Makefile for rrtm_sw - SGI platform
 
-#
-.KEEP_STATE:
+SHELL = /bin/sh
+
+###############################
+# Set variables
+###############################
+
+PLATFORM = sgi
+VERSION = v2.4.1
+
+FC = f90
+FCFLAG =  -mips4 -r10000 -lfastm -O3 -TENV:X=0
+OUTPUT = rrtm_sw_$(PLATFORM)_$(VERSION)
+CPATH = src
+CDOTO = $(PLATFORM)_$(FC)_sgl.o
+    
+CRTM = rrtm
+CSET = setcoef
+CATM = rrtatm
+CUTL = util_$(PLATFORM)
+CTAU = taumoldis
+CCLD = cldprop_sw
+CEXT = extra
+CKGS = k_g
+CRTR = rtrdis
+CR1M = R1MACH
+CD1M = D1MACH
+CERR = ErrPack
+CLPK = LINPAK
+CDIS = disort
+
+
+OBJFIL = $(CRTM).o \
+	 $(CR1M).o \
+	 $(CRTR).o \
+	 $(CATM).o \
+	 $(CSET).o \
+	 $(CTAU).o \
+	 $(CD1M).o \
+	 $(CERR).o \
+	 $(CUTL).o \
+	 $(CEXT).o \
+	 $(CLPK).o \
+	 $(CDIS).o \
+	 $(CCLD).o \
+	 $(CKGS).o 
+
+OBPATH = $(CDOTO)/$(CRTM).o \
+	 $(CDOTO)/$(CR1M).o \
+	 $(CDOTO)/$(CRTR).o \
+	 $(CDOTO)/$(CATM).o \
+	 $(CDOTO)/$(CSET).o \
+	 $(CDOTO)/$(CTAU).o \
+	 $(CDOTO)/$(CD1M).o \
+	 $(CDOTO)/$(CERR).o \
+	 $(CDOTO)/$(CUTL).o \
+	 $(CDOTO)/$(CEXT).o \
+	 $(CDOTO)/$(CLPK).o \
+	 $(CDOTO)/$(CDIS).o \
+	 $(CDOTO)/$(CCLD).o \
+	 $(CDOTO)/$(CKGS).o 
+
+MODULE = $(CPATH)/$(CRTM).o \
+	 $(CPATH)/$(CR1M).o \
+	 $(CPATH)/$(CRTR).o \
+	 $(CPATH)/$(CATM).o \
+	 $(CPATH)/$(CSET).o \
+	 $(CPATH)/$(CTAU).o \
+	 $(CPATH)/$(CD1M).o \
+	 $(CPATH)/$(CERR).o \
+	 $(CPATH)/$(CUTL).o \
+	 $(CPATH)/$(CEXT).o \
+	 $(CPATH)/$(CLPK).o \
+	 $(CPATH)/$(CDIS).o \
+	 $(CPATH)/$(CCLD).o \
+	 $(CPATH)/$(CKGS).o 
+
+###############################
+# Load line
+###############################
+
+$(OUTPUT) : \
+	intro makedir $(OBPATH) conclude
+	$(FC) $(FCFLAG) -o $(OUTPUT) $(OBPATH)
+
+###############################
+# Object compile lines
+###############################
+
+$(CDOTO)/$(CRTM).o : $(CPATH)/$(CRTM).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CRTM).f
+	\mv $(CRTM).o $(CDOTO)
+
+$(CDOTO)/$(CRTR).o : $(CPATH)/$(CRTR).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CRTR).f
+	\mv $(CRTR).o $(CDOTO)
+
+$(CDOTO)/$(CR1M).o : $(CPATH)/$(CR1M).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CR1M).f
+	\mv $(CR1M).o $(CDOTO)
+
+$(CDOTO)/$(CATM).o : $(CPATH)/$(CATM).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CATM).f
+	\mv $(CATM).o $(CDOTO)
+
+$(CDOTO)/$(CSET).o : $(CPATH)/$(CSET).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CSET).f
+	\mv $(CSET).o $(CDOTO)
+
+$(CDOTO)/$(CTAU).o : $(CPATH)/$(CTAU).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CTAU).f
+	\mv $(CTAU).o $(CDOTO)
+
+$(CDOTO)/$(CD1M).o : $(CPATH)/$(CD1M).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CD1M).f
+	\mv $(CD1M).o $(CDOTO)
+
+$(CDOTO)/$(CERR).o : $(CPATH)/$(CERR).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CERR).f
+	\mv $(CERR).o $(CDOTO)
+
+$(CDOTO)/$(CUTL).o : $(CPATH)/$(CUTL).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CUTL).f
+	\mv $(CUTL).o $(CDOTO)
+
+$(CDOTO)/$(CEXT).o : $(CPATH)/$(CEXT).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CEXT).f
+	\mv $(CEXT).o $(CDOTO)
+
+$(CDOTO)/$(CLPK).o : $(CPATH)/$(CLPK).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CLPK).f
+	\mv $(CLPK).o $(CDOTO)
+
+$(CDOTO)/$(CDIS).o : $(CPATH)/$(CDIS).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CDIS).f
+	\mv $(CDIS).o $(CDOTO)
+
+$(CDOTO)/$(CCLD).o : $(CPATH)/$(CCLD).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CCLD).f
+	\mv $(CCLD).o $(CDOTO)
+
+$(CDOTO)/$(CKGS).o : $(CPATH)/$(CKGS).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CKGS).f
+	\mv $(CKGS).o $(CDOTO)
+
+###############################
+# Create object file directory
+###############################
+
+makedir :
+	if [ ! -d $(CDOTO) ] ; \
+	then \
+	   mkdir $(CDOTO) ; \
+	fi
+
+
+###############################
+# Intro information
+###############################
+
 .SILENT:
-.SUFFIXES: .F 
-
-# name of your executable
-EXECNAME = rrtm_sw
-
-
-# All the .F files in your program that are recompiled in this directory
-FFILES = rrtm.f         \
-         rtrdis.f 	\
-         rrtatm.f	\
-         setcoef.f	\
-         cldprop_sw.f	\
-         taumoldis.f	\
-         k_g.f		\
-         extra.f	\
-         util_sgi.f	\
-         disort.f	\
-         R1MACH.f	\
-         D1MACH.f	\
-         ErrPack.f	\
-         LINPAK.f	
+intro :
+	echo
+	echo '-----------------'
+	echo '  $(OUTPUT) Makefile'
+	echo '-----------------'
+	echo
+	echo 'This Makefile was designed for the $(PLATFORM) platform.'
+	echo
+	echo 'It uses the $(FC) compiler, with the following options:'
+	echo '      $(FCFLAG)'
+	echo
+	echo 'The object files used are as follows:'
+	echo
+	echo '      $(OBJFIL)'
+	echo
+	echo
+	echo '$(OUTPUT) make in progress ...'
+	echo
 
 
-# All the .o files in your program 
-OBJS = rrtm.o         \
-         rtrdis.o 	\
-         rrtatm.o	\
-         cldprop_sw.o	\
-         setcoef.o	\
-         taumoldis.o	\
-         k_g.o		\
-         extra.o	\
-         util_sgi.o	\
-         disort.o	\
-         R1MACH.o	\
-         D1MACH.o	\
-         ErrPack.o	\
-         LINPAK.o	
 
-# Compiler specifications
-FFF = f90
+###############################
+# Concluding information
+###############################
 
-##########################################
-####### options for the FORTRAN compiler #######
-##########################################
-FFOPTS = -mips4 -r10000 -lfastm -O3 -64 -TENV:X=0
+conclude :
+	echo
+	echo '================='
+	echo '  Makefile done'
+	echo '================='
 
-
-# build the executable
-all:	$(OBJS)
-	echo "linking $@"
-	$(FFF) $(FFOPTS) -o $(EXECNAME) $(OBJS)
-
-# Define a rule for building .o from .f files
-.f.o:
-	echo "compiling $(FFOPTS) $*.f"
-	$(FFF) $(FFOPTS) -c $*.f
 
