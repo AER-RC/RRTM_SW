@@ -1,7 +1,7 @@
-C     path:      %P%
-C     revision:  %I%
-C     created:   %G%  %U%
-C     presently: %H%  %T%
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
 ****************************************************************************
 *                                                                          *
 *                               RRTM                                       *
@@ -50,7 +50,8 @@ C        level and the heating rate for each layer
       COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
       COMMON /PRECISE/   ONEMINUS
-      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD
+      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
+     &                   idelm, isccos
       COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX
       COMMON /SURFACE/   IREFLECT,SEMISS(NBANDS)
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
@@ -134,6 +135,9 @@ C ***    Process output for this atmosphere.
             IEND = IEND-1
             ISTART = IB2
          ENDIF
+         if (isccos .eq. 1) write(iwr,9880) 
+         if (isccos .eq. 2) write(iwr,9881) 
+         if (idelm .ne. 0) write(iwr,9882) 
          WRITE(IWR,9899)WAVENUM1(ISTART),WAVENUM2(IEND)
          WRITE(IWR,9900)
          WRITE(IWR,9901)
@@ -181,6 +185,12 @@ C
 
  4000 CONTINUE
 
+ 9880 format(1x,'All output fluxes have been adjusted to account for ins
+     &trumental cosine response.') 
+ 9881 format(1x,'The output diffuse fluxes have been adjusted to account
+     & for instrumental cosine response.') 
+ 9882 format(1x,'The downwelling direct and diffuse fluxes have been com
+     &puted using the delta-M scaling approximation.') 
  9899 FORMAT(1X,'Wavenumbers: ',F6.0,' - ',F6.0,' cm-1')
  9900 FORMAT(1X,'LEVEL PRESSURE   UPWARD FLUX   DIFDOWN FLUX  DIRDOWN FL  
      &UX  DOWNWARD FLUX   NET FLUX    HEATING RATE')
@@ -225,7 +235,8 @@ C      PARAMETER (MAXPROD = MXLAY*MAXXSEC)
 
       DIMENSION ALTZ(0:MXLAY),IXTRANS(14)
 
-      COMMON /CONTROL/  IAER, NSTR, IOUT, ISTART, IEND, ICLD
+      COMMON /CONTROL/  IAER, NSTR, IOUT, ISTART, IEND, ICLD,
+     &                  idelm, isccos
       COMMON /CONSTANTS/PI,FLUXFAC,HEATFAC
       COMMON /SWPROP/   ZENITH, ALBEDO, ADJFLUX
       COMMON /SURFACE/  IREFLECT,SEMISS(NBANDS)
@@ -269,8 +280,14 @@ C  Initialize molecular amount and cross section arrays to zero here.
  1000 CONTINUE
       READ (IRD,9009,END=8800) CTEST
       IF (CTEST .NE. CDOLLAR) GO TO 1000
-      READ (IRD,9011) IAER, IATM, ISCAT, ISTRM, IOUT, ICLD
-      
+      READ (IRD,9011) IAER, IATM, ISCAT, ISTRM, IOUT, ICLD, IDELM, ICOS
+
+      if (idelm.gt.1 .or. idelm.lt.0 .or. icos.gt.2 .or. icos.lt.0) then
+         print *,'INVALID MEASUREMENT COMPARISON FLAG'
+         stop
+      endif
+      isccos = icos
+
 C     No cross-sections implemented in shortwave.
       IXSECT = 0
 
@@ -410,7 +427,7 @@ C     Test for mixing ratio input.
 
  9009 FORMAT (A1,1X,I2,I2,I2)
  9010 FORMAT (A1)
- 9011 FORMAT (18X,I2,29X,I1,32X,I1,1X,I1,2X,I3,4X,I1)
+ 9011 FORMAT (18X,I2,29X,I1,32X,I1,1X,I1,2X,I3,4X,I1,3x,i1,i1)
  9012 FORMAT (11X,I1,2X,I1,14F5.3)
  9013 FORMAT (1X,I1,I3,I5)                                     
  9020 format (12X, I3, 3X, F7.4)
@@ -484,7 +501,8 @@ C               aerosol properties.
       real aerpar(3), ssa(nbands), asym(nbands), aod(mxlay),aod1(nbands)
       real rl1(nbands), rl2(nbands), rlambda(nbands), specfac(nbands)
 
-      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD
+      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
+     &                   idelm, isccos
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
       common /AERDAT/    ssaaer(mxlay,nbands), phase(mcmu,mxlay,nbands), 

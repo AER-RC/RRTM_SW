@@ -1,7 +1,7 @@
-C     path:      %P%
-C     revision:  %I%
-C     created:   %G%  %U%
-C     presently: %H%  %T%
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
       SUBROUTINE SETCOEF
 
 C     Purpose:  For a given atmosphere, calculate the indices and
@@ -13,7 +13,9 @@ C     for each band at the level and layer temperatures.
       PARAMETER (MG =16)
 
 C  Input      
-      COMMON /CONTROL/  NUMANGS, IOUT, ISTART, IEND, ICLD
+c      COMMON /CONTROL/  NUMANGS, IOUT, ISTART, IEND, ICLD
+      COMMON /CONTROL/  IAER, NSTR, IOUT, ISTART, IEND, ICLD,
+     &                  idelm, isccos
       COMMON /PROFILE/  NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                  PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
       COMMON /SPECIES/  COLDRY(MXLAY),WKL(35,MXLAY),WBROAD(MXLAY),

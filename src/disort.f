@@ -1,3 +1,6 @@
+C     path:      $Source$
+C     revision:  $Revision$
+C     created:   $Date$
 c  Note: CDIR$ and CFPP$ comment lines are relevant only when running
 c        on Cray.  They cause better optimization of loops immediately
 c        following.
@@ -7,10 +10,10 @@ c        following.
      &                   WVNMHI, USRTAU, NTAU, UTAU, NSTR, USRANG, NUMU,
      &                   UMU, NPHI, PHI, IBCND, FBEAM, UMU0, PHI0,
      &                   FISOT, LAMBER, ALBEDO, HL, BTEMP, TTEMP, TEMIS,
-     &                   DELTAM, PLANK, ONLYFL, ACCUR, PRNT, HEADER,
-     &                   MAXCLY, MAXULV, MAXUMU, MAXCMU, MAXPHI, RFLDIR,
-     &                   RFLDN, FLUP, DFDT, UAVG, UU, U0U, ALBMED,
-     &                   TRNMED )
+     &                   DELTAM, sccos, PLANK, ONLYFL, ACCUR, PRNT, 
+     &                   HEADER, MAXCLY, MAXULV, MAXUMU, MAXCMU, MAXPHI, 
+     &                   RFLDIR, RFLDN, FLUP, fldir, fldn, dirscale,
+     &                   DFDT, UAVG, UU, U0U, ALBMED, TRNMED )
 
 c *******************************************************************
 c       Plane-parallel discrete ordinates radiative transfer program
@@ -305,7 +308,7 @@ c     ..
 c     .. Scalar Arguments ..
 
       CHARACTER HEADER*127
-      LOGICAL   DELTAM, LAMBER, ONLYFL, PLANK, USRANG, USRTAU
+      LOGICAL   DELTAM, LAMBER, ONLYFL, PLANK, USRANG, USRTAU, sccos
       INTEGER   IBCND, MAXCLY, MAXCMU, MAXPHI, MAXULV, MAXUMU, NLYR,
      &          NPHI, NSTR, NTAU, NUMU
       REAL      ACCUR, ALBEDO, BTEMP, FBEAM, FISOT, PHI0, TEMIS, TTEMP,
@@ -320,11 +323,12 @@ c     .. Array Arguments ..
      &          RFLDN( MAXULV ), SSALB( MAXCLY ), TEMPER( 0:MAXCLY ),
      &          TRNMED( MAXUMU ), U0U( MAXUMU, MAXULV ), UAVG( MAXULV ),
      &          UMU( MAXUMU ), UTAU( MAXULV ),
-     &          UU( MAXUMU, MAXULV, MAXPHI )
+     &          UU( MAXUMU, MAXULV, MAXPHI ),
+     &          fldir(maxulv),fldn(maxulv)
 c     ..
 c     .. Local Scalars ..
 
-      LOGICAL   COMPAR, LYRCUT, PASS1
+      LOGICAL   COMPAR, LYRCUT, PASS1, sccomb
       INTEGER   IQ, IU, J, KCONV, L, LC, LEV, LU, MAZIM, NAZ, NCOL,
      &          NCOS, NCUT, NN
       REAL      ANGCOS, AZERR, AZTERM, BPLANK, COSPHI, DELM0, DITHER,
@@ -339,7 +343,8 @@ c     .. Local Arrays ..
      &          CBAND( MI9M2, NNLYRI ), CC( MXCMU, MXCMU ),
      &          CMU( MXCMU ), CWT( MXCMU ), DTAUCP( MXCLY ),
      &          EMU( MXUMU ), EVAL( MI ), EVECC( MXCMU, MXCMU ),
-     &          EXPBEA( 0:MXCLY ), FLDIR( MXULV ), FLDN( MXULV ),
+c     &          EXPBEA( 0:MXCLY ), FLDIR( MXULV ), FLDN( MXULV ),
+     &          EXPBEA( 0:MXCLY ), 
      &          FLYR( MXCLY ), GC( MXCMU, MXCMU, MXCLY ),
      &          GL( 0:MXCMU, MXCLY ), GU( MXUMU, MXCMU, MXCLY ),
      &          HLPR( 0:MXCMU ), KK( MXCMU, MXCLY ), LL( MXCMU, MXCLY ),
@@ -399,7 +404,6 @@ c                               Be sure SLFTST sets all print flags off.
 
       END IF
 
-
    10 CONTINUE
       IF( .NOT.PASS1 .AND. HEADER .NE. '' ) WRITE( *,
      &    FMT = '(//,1X,120(''*''),/,25X,A,/,1X,A,/,1X,120(''*''))' )
@@ -445,10 +449,10 @@ c                                 ** Zero internal and output arrays
      $              MI**2, AMB, APB,
      $              NNLYRI, IPVT, Z,
      $              MAXULV, RFLDIR, RFLDN, FLUP, UAVG, DFDT,
+     $                 fldir, fldn,
      $              MAXUMU, ALBMED, TRNMED,
      $              MAXUMU*MAXULV, U0U,
-     $              MAXUMU*MAXULV*MAXPHI, UU )
-
+     $              MAXUMU*MAXULV*MAXPHI, UU, umu0 )
 c                                 ** Perform various setup operations
 
       CALL SETDIS( CMU, CWT, DELTAM, DTAUC, DTAUCP, EXPBEA, FBEAM, FLYR,
@@ -578,7 +582,6 @@ c                                    and emissivity properties
 c ===================  BEGIN LOOP ON COMPUTATIONAL LAYERS  =============
 
          DO 60 LC = 1, NCUT
-
 c                        ** Solve eigenfunction problem in Eq. STWJ(8B);
 c                           return eigenvalues and eigenvectors
 
@@ -637,7 +640,6 @@ c ===================  END LOOP ON COMPUTATIONAL LAYERS  ===============
 
 c                      ** Set coefficient matrix of equations combining
 c                         boundary and layer interface conditions
-
          CALL SETMTX( BDR, CBAND, CMU, CWT, DELM0, DTAUCP, GC, KK,
      &                LAMBER, LYRCUT, MI, MI9M2, MXCMU, NCOL, NCUT,
      &                NNLYRI, NN, NSTR, TAUCPR, WK )
@@ -651,13 +653,13 @@ c                         geneous solution (general boundary conditions)
      &                TPLANK, TAUCPR, UMU0, Z, ZZ, ZPLK0, ZPLK1 )
 
 c                                  ** Compute upward and downward fluxes
-
+         sccomb = sccos .and. .not. pass1
       IF ( MAZIM.EQ.0 )
      $     CALL FLUXES( CMU, CWT, FBEAM, GC, KK, LAYRU, LL, LYRCUT,
      $                  MAXULV, MXCMU, MXULV, NCUT, NN, NSTR, NTAU,
      $                  PI, PRNT, SSALB, TAUCPR, UMU0, UTAU, UTAUPR,
-     $                  XR0, XR1, ZZ, ZPLK0, ZPLK1, DFDT, FLUP,
-     $                  FLDN, FLDIR, RFLDIR, RFLDN, UAVG, U0C )
+     $                  XR0, XR1, ZZ, ZPLK0, ZPLK1, sccomb, DFDT, FLUP,
+     $                  FLDN, FLDIR, RFLDIR, RFLDN, dirscale, UAVG, U0C)
 
          IF( ONLYFL ) THEN
 
@@ -2335,8 +2337,8 @@ c                                       ** Loop over user levels
       SUBROUTINE FLUXES( CMU, CWT, FBEAM, GC, KK, LAYRU, LL, LYRCUT,
      &                   MAXULV, MXCMU, MXULV, NCUT, NN, NSTR, NTAU, PI,
      &                   PRNT, SSALB, TAUCPR, UMU0, UTAU, UTAUPR, XR0,
-     &                   XR1, ZZ, ZPLK0, ZPLK1, DFDT, FLUP, FLDN, FLDIR,
-     &                   RFLDIR, RFLDN, UAVG, U0C )
+     &                   XR1, ZZ, ZPLK0, ZPLK1,sccomb, DFDT, FLUP, FLDN, 
+     &                   FLDIR, RFLDIR, RFLDN, gcosres_ang0, UAVG, U0C )
 
 c       Calculates the radiative fluxes, mean intensity, and flux
 c       derivative with respect to optical depth from the m=0 intensity
@@ -2398,7 +2400,7 @@ c     .. Scalar Arguments ..
 c     ..
 c     .. Array Arguments ..
 
-      LOGICAL   PRNT( * )
+      LOGICAL   PRNT( * ), sccomb
       INTEGER   LAYRU( MXULV )
       REAL      CMU( MXCMU ), CWT( MXCMU ), DFDT( MAXULV ),
      &          FLDIR( MXULV ), FLDN( MXULV ), FLUP( MAXULV ),
@@ -2412,6 +2414,7 @@ c     .. Local Scalars ..
 
       INTEGER   IQ, JQ, LU, LYU
       REAL      ANG1, ANG2, DIRINT, FACT, FDNTOT, FNET, PLSORC, ZINT
+      real      gcosres(mxcmu)
 c     ..
 c     .. External Subroutines ..
 
@@ -2424,6 +2427,11 @@ c     ..
 
 
       IF( PRNT( 2 ) ) WRITE( *, 9000 )
+c                                         ** check for cosine response
+        
+      ang0 = (180./3.14159) * acos(umu0)
+      if (sccomb) call gen_cosresponse(mxcmu,nstr,cmu,ang0,
+     &     gcosres,gcosres_ang0)
 c                                          ** Zero DISORT output arrays
       CALL ZEROIT( U0C, MXULV*MXCMU )
       CALL ZEROIT( FLDIR, MXULV )
@@ -2483,9 +2491,15 @@ c                                                ** this level
 
             U0C( IQ, LU ) = U0C( IQ, LU ) + ZPLK0( IQ, LYU ) +
      &                      ZPLK1( IQ, LYU )*UTAUPR( LU )
-            UAVG( LU ) = UAVG( LU ) + CWT( NN + 1 - IQ )*U0C( IQ, LU )
-            FLDN( LU ) = FLDN( LU ) + CWT( NN + 1 - IQ )*
-     &                   CMU( NN + 1 - IQ )*U0C( IQ, LU )
+            if (sccomb) then
+               UAVG( LU ) = UAVG(LU) + CWT( NN + 1 - IQ )*U0C( IQ, LU )
+               FLDN( LU ) = FLDN( LU ) + gcosres(nn+1-iq) *
+     &              CWT( NN + 1 - IQ )*CMU( NN + 1 - IQ )*U0C( IQ, LU )
+            else
+               UAVG( LU ) = UAVG(LU) + CWT( NN + 1 - IQ )*U0C( IQ, LU )
+               FLDN( LU ) = FLDN( LU ) + CWT( NN + 1 - IQ )*
+     &              CMU( NN + 1 - IQ )*U0C( IQ, LU )
+            endif
    30    CONTINUE
 
 
@@ -2511,12 +2525,22 @@ c                                                ** this level
 
             U0C( IQ, LU ) = U0C( IQ, LU ) + ZPLK0( IQ, LYU ) +
      &                      ZPLK1( IQ, LYU )*UTAUPR( LU )
-            UAVG( LU ) = UAVG( LU ) + CWT( IQ - NN )*U0C( IQ, LU )
-            FLUP( LU ) = FLUP( LU ) + CWT( IQ - NN )*CMU( IQ - NN )*
-     &                   U0C( IQ, LU )
+            if (sccomb) then
+               UAVG( LU ) = UAVG( LU ) + CWT( IQ - NN )*U0C( IQ, LU )
+               FLUP( LU ) = FLUP( LU ) + gcosres(iq-nn) *
+     &              CWT( IQ - NN )*CMU( IQ - NN )*U0C( IQ, LU )
+            else
+               UAVG( LU ) = UAVG( LU ) + CWT( IQ - NN )*U0C( IQ, LU )
+               FLUP( LU ) = FLUP( LU ) + CWT( IQ - NN )*CMU( IQ - NN )*
+     &              U0C( IQ, LU )
+            endif
+
    60    CONTINUE
 
-
+         if (sccomb) then
+            fldir(lu) = gcosres_ang0 * fldir(lu)
+            rfldir(lu) = gcosres_ang0 * rfldir(lu)
+         endif
          FLUP( LU )  = 2.*PI*FLUP( LU )
          FLDN( LU )  = 2.*PI*FLDN( LU )
          FDNTOT      = FLDN( LU ) + FLDIR( LU )
@@ -2571,6 +2595,95 @@ c                                                ** this level
 
       END
 
+      subroutine gen_cosresponse(mxcmu,nang,gmu,ang0,
+     &     gcosres,gcosres_ang0)
+
+      parameter (n_val = 500)
+      dimension cosres(n_val),zang(n_val),gmu(mxcmu),gcosres(mxcmu)
+      character*1 ctest, cpercent
+      data cpercent /'%'/
+
+      icosu = 89
+      OPEN(icosu,FILE='COSINE_RESPONSE',FORM='FORMATTED',STATUS='OLD')
+      npts=0
+ 1000 continue
+      npts = npts+1
+      read(icosu,9001,end=9000) ctest, zang(npts), cosres(npts)
+      if (ctest .eq. cpercent) go to 9000
+      goto 1000
+ 9000 continue
+      close (89)
+      npts = npts - 1
+
+      do 200 i=1, nang
+         gmu_inv = (180./3.14159)*acos(gmu(i))
+         if (gmu_inv .ge. 90.0) gmu_inv = 180. - gmu_inv 
+         call locate(zang(1:npts),npts,gmu_inv,nloc)
+         if (nloc .eq. 0) then
+            ja = 1
+            jb = 2
+         else if (nloc .eq. npts) then
+            ja = npts - 1
+            jb = npts
+         else
+            ja = nloc
+            jb = nloc+1
+         endif
+         p = (gmu_inv - zang(ja))/(zang(jb)-zang(ja))
+         gcosres(i) = p*cosres(jb) + (1.0-p)*cosres(ja)
+ 200  continue
+
+c Calculate cosine response for zenith angle      
+      call locate(zang(1:npts),npts,ang0,nloc)
+      if (nloc .eq. 0) then
+         ja = 1
+         jb = 2
+      else if (nloc .eq. npts) then
+         ja = npts - 1
+         jb = npts
+      else
+         ja = nloc
+         jb = nloc+1
+      endif
+      p = (ang0 - zang(ja))/(zang(jb)-zang(ja))
+      gcosres_ang0 = p*cosres(jb) + (1.0-p)*cosres(ja)
+
+ 9001 format(a1,f10.6,f10.6)
+
+      return
+      end
+
+      SUBROUTINE LOCATE(XX,N,X,J)
+
+C     GIVEN AN ARRAY XX(1:N), AND GIVEN A VALUE X, RETURN A VALUE J
+C     SUCH THAT X IS BETWEEN XX(J) AND XX(J+1). XX(1:N) MUST BE MONOTONIC,
+C     IN EITHER ASCENDING OR DESCENDING ORDER. A VALUE OF RETURNED OF J=0
+C     OR J=N SIGNIFIES THAT X IS OUT OF RANGE.
+C     OBTAINED FROM NUMERICAL RECIPES FOR FORTRAN 77.
+
+      INTEGER J,N
+      REAL X,XX(N)
+      INTEGER JL,JM,JU
+      JL=0
+      JU=N+1
+ 10   IF(JU-JL.GT.1) THEN
+         JM=(JU+JL)/2
+         IF((XX(N).GE.XX(1)).EQV.(X.GE.XX(JM)))THEN
+            JL=JM
+         ELSE
+            JU=JM
+         ENDIF
+      GOTO 10
+      ENDIF
+      IF(X.EQ.XX(1))THEN
+         J=1
+      ELSE IF(X.EQ.XX(N))THEN
+         J=N-1
+      ELSE
+         J=JL
+      ENDIF
+      RETURN
+      END
       SUBROUTINE LEPOLY( NMU, M, MAXMU, TWONM1, MU, YLM )
 
 c       Computes the normalized associated Legendre polynomial,
@@ -5660,9 +5773,10 @@ c                               component for isotropic surface
      &                    ND14, AMB, APB,
      &                    ND15, IPVT, Z,
      &                    ND16, RFLDIR, RFLDN, FLUP, UAVG, DFDT,
+     &                         fldir,fldn,
      &                    ND17, ALBMED, TRNMED,
      &                    ND18, U0U,
-     &                    ND19, UU )
+     &                    ND19, UU, umu0 )
 
 c         ZERO ARRAYS; NDn is dimension of all arrays following
 c         it in the argument list
@@ -5686,7 +5800,8 @@ c     .. Array Arguments ..
      &          TRNMED( * ), U0U( * ), UAVG( * ), UTAUPR( * ), UU( * ),
      &          WK( * ), XR0( * ), XR1( * ), YLM0( * ), YLMC( * ),
      &          YLMU( * ), Z( * ), Z0( * ), Z0U( * ), Z1( * ), Z1U( * ),
-     &          ZBEAM( * ), ZJ( * ), ZPLK0( * ), ZPLK1( * ), ZZ( * )
+     &          ZBEAM( * ), ZJ( * ), ZPLK0( * ), ZPLK1( * ), ZZ( * ),
+     &          fldir(*),fldn(*)
 c     ..
 c     .. Local Scalars ..
 
@@ -5702,7 +5817,6 @@ c     ..
          XR0( N )    = 0.0
          XR1( N )    = 0.0
    10 CONTINUE
-
       DO 20 N = 1, ND2
          CMU( N ) = 0.0
          CWT( N ) = 0.0
@@ -5783,6 +5897,8 @@ c     ..
          FLUP( N )   = 0.
          UAVG( N )   = 0.
          DFDT( N )   = 0.
+         fldir( n )  = 0.
+         fldn( n )   = 0.
   160 CONTINUE
 
       DO 170 N = 1, ND17
