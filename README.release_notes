@@ -59,4 +59,12 @@ October 11, 2001
 	Repaired all revision numbers and output so OUTPUT_RRTM file
 	will have CVS revision numbers.
 		
+April, 2002
 
+	Release_2_4 - Addition of Q. Fu ice particle parameterization
+
+	To incorporate this parameterization required the explicit
+	calculation outside of disort of the delta-m scaling
+	method for all species (cloud, aerosol, gases).
+
+	
