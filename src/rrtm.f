@@ -694,7 +694,7 @@ c        For this aerosol, read and store optical properties
       CLOSE(IRDAER)
 
  9010 format (4x, i1)
- 9011 format (4x, i1, 4x, i1, 4x, i1, 4x, i1, 3f8.3)
+ 9011 format (2x, i3, 4x, i1, 4x, i1, 4x, i1, 3f8.3)
  9012 format (2x, i3, 14f7.4)
  9013 format (14f5.3)
 
