@@ -18,7 +18,9 @@ C     per g-value per band.
 
       INCLUDE 'param.f'
 
-      COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
+      COMMON /CONSTANTS/ FLUXFAC,HEATFAC
+      COMMON /CONSTS/ PI,PLANCK,BOLTZ,CLIGHT,AVOGAD,ALOSMT,GASCON,
+     *                RADCN1,RADCN2 
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
       COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
      &                   idelm, isccos
@@ -33,7 +35,9 @@ C     per g-value per band.
       COMMON /AERDAT/    ssaaer(mxlay,nbands), phase(mcmu,mxlay,nbands), 
      &                   tauaer(mxlay,nbands)
       COMMON /CLOUDDAT/  NCBANDS,CLDFRAC(MXLAY),TAUCLOUD(MXLAY,NBANDS),
-     &                   SSACLOUD(MXLAY,NBANDS),XMOM(0:16,MXLAY,NBANDS)
+     &                   SSACLOUD(MXLAY,NBANDS),
+     &                   XMOM(0:16,MXLAY,NBANDS),
+     &                   TAUCLDORIG(MXLAY,NBANDS)
       COMMON /OUTPUT/    TOTUFLUX(0:MXLAY), TOTDFLUX(0:MXLAY),
      &                   DIFDOWN(0:MXLAY), DIRDOWN(0:MXLAY),
      &                   FNET(0:MXLAY), HTR(0:MXLAY)
@@ -50,6 +54,7 @@ C     per g-value per band.
       DIMENSION BBD1(MXLAY),BBD2(MXLAY),BBD3(MXLAY)
       DIMENSION WTNUM(MXANG)
 
+
       CHARACTER HEADER*127
       LOGICAL   DELTAM, LAMBER, ONLYFL, PLANK, USRANG, USRTAU
       INTEGER   IBCND, MAXCLY, MAXCMU, MAXPHI, MAXULV, MAXUMU, 
@@ -65,6 +70,8 @@ C     per g-value per band.
      &          UMU( MUMU ), UTAU( MXLAY ),
      &          UU( MUMU, MXLAY, MPHI ),fldir(mxlay),fldn(mxlay)
       DIMENSION PHASERAY(0:MXSTR)
+
+
       DATA PRNT /.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.,
      &     .FALSE.,.FALSE./
 
@@ -92,7 +99,8 @@ C     per g-value per band.
       ELSE
          LAMBER = .FALSE.
       ENDIF
-      DELTAM = .TRUE.
+
+      DELTAM = .FALSE.
       PLANK = .FALSE.
       ONLYFL = .TRUE.
       ACCUR = 0.0001
@@ -116,6 +124,9 @@ C     per g-value per band.
 
 C *** Loop over frequency bands.
       DO 6000 IBAND = ISTART, IEND
+        
+         IB = IBAND
+
          IF (IBAND .EQ. 16) THEN
             CALL TAUGB16
          ELSEIF (IBAND .EQ. 17) THEN
@@ -157,24 +168,37 @@ C ***    Downward radiative transfer.
          FBEAM = ADJFLUX * SOL
          UMU0 = abs(1./SECZEN)
          DO 3900 LAY = NLAYERS, 1, -1
-            TAUREV(NLAYERS-LAY+1) = TAUG(LAY,IG)+tauaer(lay,iband)
-     &           +taucloud(lay,iband)
-            scataer = ssaaer(lay,iband) * tauaer(lay,iband)
-            scatray = ssa(lay,ig) * taug(lay,ig)
-            scatcld = ssacloud(lay,iband)*taucloud(lay,iband)
-            SSALB(NLAYERS-LAY+1) = (scataer + scatray+scatcld)/
-     &           taurev(nlayers-lay+1)
-            pmom(0,nlayers-lay+1) = 1.
-            pmom(1,nlayers-lay+1) = (scataer * phase(1,lay,iband)+
-     &           scatcld*xmom(1,lay,iband))/ 
-     &           (scataer + scatray + scatcld) 
-            pmom(2,nlayers-lay+1) = (scataer * phase(2,lay,iband) + 
-     &           scatray*phaseray(2) + scatcld*xmom(2,lay,iband))
-     &           / (scataer + scatray + scatcld)
+            FORWAER = PHASE(1,LAY,IBAND)**NSTR
+            PHMULT = 1. / (1. - FORWAER)
+            SSADMAER = SSAAER(LAY,IBAND) * (1. - FORWAER) /
+     &           (1. - FORWAER * SSAAER(LAY,IBAND))
+            TAUDMAER = TAUAER(LAY,IBAND) * (1. - FORWAER *
+     &           SSAAER(LAY,IBAND))
+            TAUREV(NLAYERS-LAY+1) = TAUG(LAY,IG)  + TAUDMAER +
+     &           TAUCLOUD(LAY,IB)
+            SCATAER = SSADMAER * TAUDMAER
+            SCATRAY = SSA(LAY,IG) * TAUG(LAY,IG)
+            SCATCLD = SSACLOUD(LAY,IB) * TAUCLOUD(LAY,IB)
+            SSALB(NLAYERS-LAY+1) = (SCATAER + SCATRAY + SCATCLD)/
+     &           TAUREV(NLAYERS-LAY+1)
+            IF (SSALB(NLAYERS-LAY+1) .GT. 1.0) THEN
+               PRINT*,'WARNING SSALB > 1.0, LAYER ',LAY,
+     &              SSALB(NLAYERS-LAY+1)
+           ENDIF
+            PMOM(0,NLAYERS-LAY+1) = 1.
+            PHAER1 = PHMULT * (PHASE(1,LAY,IBAND) - FORWAER)
+            PMOM(1,NLAYERS-LAY+1) = (SCATAER * PHAER1 +
+     &           SCATCLD*XMOM(1,LAY,IB))/ 
+     &           (SCATAER + SCATRAY + SCATCLD) 
+            PHAER2 = PHMULT * (PHASE(2,LAY,IBAND) - FORWAER)
+            PMOM(2,NLAYERS-LAY+1) = (SCATAER * PHAER2 + 
+     &           SCATRAY*PHASERAY(2) + SCATCLD*XMOM(2,LAY,IB))
+     &           / (SCATAER + SCATRAY + SCATCLD)
             DO 3850 K = 3, NSTR
-               PMOM(K,nlayers-LAY+1) = (scataer * phase(k,lay,iband)
-     &              +scatcld*xmom(k,lay,iband))/ 
-     &              (scataer + scatray + scatcld)
+               PHAERK = PHMULT * (PHASE(K,LAY,IBAND) - FORWAER)
+               PMOM(K,NLAYERS-LAY+1) = (SCATAER * PHAERK +
+     &              SCATCLD*XMOM(K,LAY,IB))/ 
+     &              (SCATAER + SCATRAY + SCATCLD)
  3850       CONTINUE
  3900    CONTINUE
          CALL DISORT( NLAYERS, TAUREV, SSALB, PMOM, TEMPER, WVNMLO,
@@ -185,16 +209,29 @@ C ***    Downward radiative transfer.
      &                   HEADER, MAXCLY, MAXULV, MAXUMU, MAXCMU, MAXPHI, 
      &                   RFLDIR, RFLDN, FLUP, fldir, fldn, dirscale,
      &                   DFDT, UAVG, UU, U0U, ALBMED, TRNMED )
-         DO 3950 LEV = 0, NLAYERS
+         DO 3950 LEV = NLAYERS, 0, -1
 C     Sum up either actual downward fluxes (IDELM=0) or delta-M scaled
-C     downward fluxes.
-            if (idelm .eq. 0) then
-               DIRDOWN(LEV) = DIRDOWN(LEV) + RFLDIR(NLAYERS-LEV+1)
-               DIFDOWN(LEV) = DIFDOWN(LEV) + RFLDN(NLAYERS-LEV+1)
-            else
+C     downward fluxes.  Since the delta-M scaling is being handled 
+C     outside of DISORT, the RFL and FL output variables are equal. 
+C     (FYI: Had DELTAM been set to 1 in the call to DISORT, the FL
+C     outputs would be the deltaM scaled fluxes and the RFL the 
+C     unscaled fluxes.
+            IF (IDELM .EQ. 0) THEN
+               TOTDFLX = FLDIR(NLAYERS-LEV+1) + FLDN(NLAYERS-LEV+1)
+               IF (LEV .EQ. NLAYERS) THEN
+                  DIRFLUX = FBEAM * UMU0
+               ELSE
+                  TAUORIG = TAUG(LEV+1,IG) + 
+     &                 TAUAER(LEV+1,IBAND) + TAUCLDORIG(LEV+1,IB)
+                  TRANS = EXP(-TAUORIG/UMU0)
+                  DIRFLUX = DIRFLUX * TRANS
+               ENDIF
+               DIRDOWN(LEV) = DIRDOWN(LEV) + DIRFLUX
+               DIFDOWN(LEV) = DIFDOWN(LEV) + (TOTDFLX - DIRFLUX)
+            ELSE
                DIRDOWN(LEV) = DIRDOWN(LEV) + FLDIR(NLAYERS-LEV+1)
                DIFDOWN(LEV) = DIFDOWN(LEV) + FLDN(NLAYERS-LEV+1)
-            endif
+            ENDIF
             TOTUFLUX(LEV) = TOTUFLUX(LEV) + FLUP(NLAYERS-LEV+1)
  3950    CONTINUE
 
@@ -203,12 +240,12 @@ C     downward fluxes.
  6000 CONTINUE
 
       DIFDOWN(NLAYERS) = 0.
-      if (isccos .eq. 2) DIRDOWN(NLAYERS) = DIRDOWN(NLAYERS)/DIRSCALE
+      IF (ISCCOS .EQ. 2) DIRDOWN(NLAYERS) = DIRDOWN(NLAYERS)/DIRSCALE
       TOTDFLUX(NLAYERS) = DIRDOWN(NLAYERS)
       FNET(NLAYERS) = TOTDFLUX(NLAYERS) - TOTUFLUX(NLAYERS)
       HTR(NLAYERS) = 0.
       DO 3951 LEV = NLAYERS-1, 0, -1
-         if (isccos .eq. 2) DIRDOWN(LEV) =  DIRDOWN(LEV)/DIRSCALE
+         IF (ISCCOS .EQ. 2) DIRDOWN(LEV) =  DIRDOWN(LEV)/DIRSCALE
          TOTDFLUX(LEV) =  DIRDOWN(LEV) + DIFDOWN(LEV)
          FNET(LEV) = TOTDFLUX(LEV) - TOTUFLUX(LEV)
          HTR(LEV) = -HEATFAC * (FNET(LEV) -FNET(LEV+1)) /
