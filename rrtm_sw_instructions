@@ -8,7 +8,7 @@
 
                            USER INSTRUCTIONS FOR RRTM_SW
  
-                                   18 July 2001
+                                   April 2002
 
 
 
@@ -225,11 +225,11 @@
  RECORD 3.1
  
  
-      MODEL,   IBMAX,  NOPRNT,  NMOL, IPUNCH,   MUNITS,    RE,      CO2MX
+      MODEL,   IBMAX,  NOPRNT,  NMOL, IPUNCH,   MUNITS,    RE,      CO2MX, REF_LAT
  
-          5,      15,      25,    30,     35,    39-40, 41-50,      71-80
+          5,      15,      25,    30,     35,    39-40, 41-50,      71-80, 81-90
 
-         I5,  5X, I5,  5X, I5,    I5,     I5,   3X, I2, F10.3, 20X, F10.3
+         I5,  5X, I5,  5X, I5,    I5,     I5,   3X, I2, F10.3, 20X, F10.3, F10.3
  
  
            MODEL   selects atmospheric profile
@@ -267,6 +267,12 @@
  
            CO2MX     mixing ratio for CO2 (ppm).  Default is 330 ppm.
  
+	 REF_LAT     latitude of location of calculation (degrees)
+		     defaults for REF_LAT = 0:
+		     a) MODEL 0,2,3,6    REF_LAT = 45.0 degrees
+		     b) MODEL 1          REF_LAT = 15.0
+		     c) MODEL 4,5        REF_LAT = 60.0
+	   
  
 
  -----------------------------------------------------------------------------
@@ -319,7 +325,14 @@
                 ZBND(I), I=1, IBMAX   altitudes of RRTM layer boundaries
  
                (8F10.3)
- 
+
+ 	            If IBMAX < 0 
+
+		PBND(I), I=1, ABS(IBMAX) pressures of LBLRTM layer boundaries
+
+               (8F10.3)
+
+
  --------------------------------------------------------------------------------
 
  -----------------------------------------------------------------------------
@@ -352,7 +365,11 @@
     E10.3, E10.3, E10.3,   5x,  A1,     A1,    3X,    28A1
  
  
-          ZM       boundary altitude (km)
+          ZM       boundary altitude (km). If IMMAX < 0, altitude levels are 
+		   computed from pressure levels PM. If any altitude levels are
+		   provided, they are ignored if  IMMAX < 0 (exception: The
+		   first input level must have an accompanying ZM for input
+	 	   into the hydrostatic equation)
  
           PM       pressure (units and input options set by JCHARP)
  
@@ -533,42 +550,73 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
 
       4X, I1,  4X, I1,  4X, I1
 
-(Note:  Currently ice clouds are not implemented.  ICEFLAG is ignored and users should ignore anything
-in this document that claims otherwise.)
 
       Note:  ICEFLAG and LIQFLAG are required only if INFLAG = 2.
 
             INFLAG = 0 direct specification of optical depths of clouds;
-                       cloud fraction and cloud optical depth (gray) are
-                       input for each cloudy layer
+                       cloud fraction and cloud optical depth (gray), single scattering albedo,
+		       and N-str moments of the phase function
+
                    = 2 calculation of separate ice and liquid cloud optical depths, with
                        parameterizations determined by values of ICEFLAG and LIQFLAG. 
                        Cloud fraction, cloud water path, cloud ice fraction, and
                        effective ice radius are input for each cloudy layer for all 
                        parameterizations.  If LIQFLAG = 1, effective liquid droplet radius
-                       is also needed.  
+                       is also needed.  If ICEFLAG = 1, generalized effective size is
+		       is also needed.
 
-            ICEFLAG = 0 the optical depths (gray) due to ice clouds are computed as in CCM3.
-                    = 1 the optical depths (non-gray) due to ice clouds are computed as closely as
-                        possible to the method in E.E. Ebert and J.A. Curry, JGR, 97, 3831-3836 (1992).
-                    = 2 the optical depths (non-gray) due to ice clouds are computed by a method
-                        based on the parameterization used in the radiative transfer model Streamer
-                        (reference: J. Key, Streamer User's Guide, Technical Report 96-01, Boston
-                        University, 85 pp. (1996)), which is closely related to the parameterization
-                        of water clouds due to Hu and Stamnes (see below).
+            ICEFLAG = 3 the optical depths are computed by a method based on the parameterization
+			of ice clouds due to Q. Fu, J. Clim., 9, 2058 (1996).
 
-            LIQFLAG = 0 the optical depths (gray) due to water clouds are computed as in CCM3.
-                    = 1 the optical depths (non-gray) due to water clouds are computed by a method
+            LIQFLAG = 1 the optical depths (non-gray) due to water clouds are computed by a method
                         based on the parameterization of water clouds due to Y.X. Hu and K. Stamnes,
                         J. Clim., 6, 728-742 (1993).
                        
-	     These methods are further detailed in the comments in the routine 'cldprop.f'.
+	     These methods are further detailed in the comments in the routine 'cldprop_sw.f'.
 
 
 
- RECORD C1.2  (one record for each cloudy layer)
+ RECORD C1.2  (one record for each cloudy layer, if INFLAG = 0)
 
-      TESTCHAR,    LAY, CLDFRAC,   TAUCLD or CWP, FRACICE, EFFRADICE, EFFRADLIQ
+      TESTCHAR,    LAY, CLDFRAC,   TAUCLD or CWP,SINGLE-SCAT, PMOM(0:NSTR)
+						   ALBEDO	
+             1,    3-5,    6-15,           16-25,   26-35,     36-196
+
+            A1, 1X, I3,   E10.5,           E10.5,   E10.5,     16E10.5
+
+
+            TESTCHAR   control character -- if equal to '%', cloud input processing
+                       is terminated
+
+            LAY        layer number of cloudy layer.  The layer numbering refers to the
+                       ordering for the upward radiative transfer, i.e. botton to top.
+                       For IATM = 0 (Record 1.2), each layer's number is equal to the  
+                       position of its Record 2.1.1 in the grouping of these records.
+                       For example, the second Record 2.1.1 occurring after Record 2.1
+                       corresponds to the second layer.  For IATM = 1 (Record 1.2) and 
+                       IBMAX > 0 (Record 3.1), layer n corresponds to the region between 
+                       altitudes n and n+1 in the list of layer boundaries in Record 3.3B.  
+                       For IATM = 1 (Record 1.2) and IBMAX = 0 (Record 3.1), the layer 
+                       numbers can be determined by running RRTM for the cloudless case
+                       and examining the TAPE6 output from this run.
+                       
+            CLDFRAC    cloud fraction for the layer (option currently not implemented)
+
+            TAUCLD     (INFLAG = 0 only) total (ice and water) optical depth for the layer
+
+	    SINGLE-SCATTERING SIngle-scattering albedo for cloudy layer (unitless)
+	    ALBEDO		
+
+	    PMOM       Moments of the phase function, from 0 to NSTR. (unitless)
+       
+            Note: The true optical depth,single-scattering albedo, and phase function moments must be input.  
+		  The Delta-M scaling, using the standard Henyey-Greenstein approach, is applied to the 
+                  input cloud properties.
+
+
+ RECORD C1.3  (one record for each cloudy layer, INFLAG = 2)
+
+      TESTCHAR,    LAY, CLDFRAC,   TAUCLD or CWP, FRACICE, EFFSIZEICE, EFFSIZELIQ
 
              1,    3-5,    6-15,           16-25,   26-35,     36-45,     46-55
 
@@ -598,9 +646,12 @@ in this document that claims otherwise.)
             FRACICE    (INFLAG = 2) fraction of the layer's cloud water path in the form
                        of ice particles  
 
-            EFFRADICE  (INFLAG = 2) ice particle effective radius (microns) 
+            EFFSIZEICE  (INFLAG = 2 and ICEFLAG = 3) Generalized effective size of 
+	               ice crystals, dge (see Q. Fu, 1996, for definition of this parameter)
+	               Valid sizes are 5.0 - 140.0 microns.
 
-            EFFRADLIQ  (INFLAG = 2 and LIQFLAG = 1) liquid droplet effective radius (microns) 
+            EFFSIZELIQ  (INFLAG = 2 and LIQFLAG = 1) liquid droplet effective radius, re (microns) 
+                       Valid sizes are 2.5 - 60.0 microns.
 
 
 
