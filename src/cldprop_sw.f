@@ -1,7 +1,7 @@
-C     path:      /stormrc1/aer_rrtm/SCCS/s.cldprop.f
-C     revision:  1.6
-C     created:   8/21/97  12:17:36
-C     presently: 11/10/99  10:20:49
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
       SUBROUTINE CLDPROP_SW(ICLDATM)
 
 C     Purpose:  Compute the cloud optical depth(s) for each cloudy
@@ -19,11 +19,16 @@ C               (Hu & Stamnes) are implemented.
      &     TAUCLOUD(MXLAY,NBANDS),SSACLOUD(MXLAY,NBANDS),
      &     xmom(0:16,MXLAY,NBANDS)
 
-      COMMON /HVERSN/    HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVRRGC,HVRRTC,HVRCLD,HVRDUM,HVRUTL,HVREXT
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*8 HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVRRGC,HVRRTC,HVRCLD,HVRDUM,HVRUTL,HVREXT
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
       DIMENSION ABSICE0(2), ABSICE1(2,5), ABSICE2(40,16)
       DIMENSION ABSLIQ1(58,16)
       DIMENSION ABSCOICE(NBANDS), ABSCOLIQ(NBANDS)
@@ -679,7 +684,7 @@ C     BAND 29
      &9.492311E-01,9.499019E-01,9.510077E-01,9.526084E-01,9.547636E-01,
      &9.575331E-01,9.609766E-01,9.6515E-01/
 
-      HVRCLD = '1.6'
+      HVRCLD = '$Revision$'
 
       ICLDATM = 0
       NCBANDS = 1
