@@ -34,11 +34,11 @@
 
  RECORD 1.2
  
-      IAER,    IATM,   ISCAT,  ISTRM,   IOUT,   ICLD
+      IAER,    IATM,   ISCAT,  ISTRM,   IOUT,   ICLD,  IDELM, ICOS
  
-        20,      50,      83,     85,  88-90,     95
+        20,      50,      83,     85,  88-90,     95,     99,  100
  
-   18x, I2, 29X, I1, 32X, I1, 1X, I1, 2X, I3, 4X, I1
+   18x, I2, 29X, I1, 32X, I1, 1X, I1, 2X, I3, 4X, I1, 3X, I1,   I1
  
  
 	  IAER   (0,10)   flag for aerosols
@@ -69,7 +69,25 @@
                   = 0  no cloudy layers in atmosphere
                   = 1  one or more cloudy layers present in atmosphere
                        (requires the presence of file IN_CLD_RRTM)
+  
+  Measurement comparison flags:
+          IDELM  (0,1) flag for outputting downwelling fluxes computed using the delta-M scaling approximation
+                  = 0  output "true" direct and diffuse downwelling fluxes
+                  = 1  output direct and diffuse downwelling fluxes computed with delta-M approximation
+                 (Note:  The delta-M approximation is always used internally in RRTM_SW to compute the total
+                 downwelling flux at each level.  What the IDELM flag determines is whether the components 
+                 of the downwelling flux, the direct and diffuse fluxes, that are output are the actual direct
+                 and diffuse fluxes (IDELM = 0) or are those computed using the delta-M approximation (IDELM = 1).
+                 If the computed direct and diffuse fluxes are being compared with corresponding measured fluxes 
+                 and a nontrivial amount of forward scattered radiation is likely to have been included in the
+                 measurement of the direct flux, then IDELM should be set to 1.)
 
+          ICOS   = 0 there is no need to account for instrumental cosine response
+                 = 1 to account for instrumental cosine response in the computation of the direct and diffuse fluxes 
+                 = 2 to account for instrumental cosine response in the computation of the diffuse fluxes only
+                 (Note:  ICOS = 1 and ICOS = 2 requires the presence of the file COSINE_RESPONSE, which should 
+                 consist of lines containing pairs of numbers (ANG, COSFAC), where COSFAC is the instrumental cosine
+                 response at the angle ANG.) 
  
 
  RECORD 1.2.1  
