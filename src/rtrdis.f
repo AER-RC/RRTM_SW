@@ -1,7 +1,7 @@
-C     path:      %P%
-C     revision:  %I%
-C     created:   %G%  %U%
-C     presently: %H%  %T%
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
       SUBROUTINE RTRDIS
 
 C *** This program calculates the upward fluxes, downward fluxes,
@@ -20,7 +20,8 @@ C     per g-value per band.
 
       COMMON /CONSTANTS/ PI,FLUXFAC,HEATFAC
       COMMON /FEATURES/  NG(IB1:IB2),NSPA(IB1:IB2),NSPB(IB1:IB2)
-      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD
+      COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
+     &                   idelm, isccos
       COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX
       COMMON /SURFACE/   IREFLECT,SEMISS(NBANDS)
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
@@ -51,18 +52,21 @@ C     per g-value per band.
      &          NPHI, NSTR, NTAU, NUMU
       REAL      ACCUR, ALBEDO, BTEMP, FBEAM, FISOT, PHI0, TEMIS, TTEMP,
      &          UMU0, WVNMHI, WVNMLO
-      LOGICAL   PRNT( 7 )
+      LOGICAL   PRNT( 7 ), sccos
       REAL      ALBMED( MUMU ), DFDT( MXLAY ), TAUREV(MXLAY),
      &          FLUP( MXLAY ), HL( 0:MCMU ), PHI( MPHI ),
      &          PMOM( 0:MCMU, MXLAY ), RFLDIR( MXLAY ),
      &          RFLDN( MXLAY ), SSALB( MXLAY ), TEMPER( 0:MXLAY ),
      &          TRNMED( MUMU ), U0U( MUMU, MXLAY ), UAVG( MXLAY ),
      &          UMU( MUMU ), UTAU( MXLAY ),
-     &          UU( MUMU, MXLAY, MPHI )
+     &          UU( MUMU, MXLAY, MPHI ),fldir(mxlay),fldn(mxlay)
       DIMENSION PHASERAY(0:MXSTR)
       HVRRTR = '%I%'
       DATA PRNT /.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.,
      &     .FALSE.,.FALSE./
+
+      sccos = .false.
+      if (isccos .gt. 0) sccos = .true.
 
       PHASERAY(0) = 1.0
       PHASERAY(1) = 0. 
@@ -72,7 +76,6 @@ C     per g-value per band.
  120  CONTINUE
 
       SECZEN = 1. / ZENITH
-
       HEADER = ''
       USRTAU = .FALSE.
       USRANG = .FALSE.
@@ -172,14 +175,21 @@ C ***    Downward radiative transfer.
          CALL DISORT( NLAYERS, TAUREV, SSALB, PMOM, TEMPER, WVNMLO,
      &                   WVNMHI, USRTAU, NTAU, UTAU, NSTR, USRANG, NUMU,
      &                   UMU, NPHI, PHI, IBCND, FBEAM, UMU0, PHI0,
-     &                   FISOT, LAMBER, ALBEDO, HL, BTEMP, TTEMP, TEMIS,
-     &                   DELTAM, PLANK, ONLYFL, ACCUR, PRNT, HEADER,
-     &                   MAXCLY, MAXULV, MAXUMU, MAXCMU, MAXPHI, RFLDIR,
-     &                   RFLDN, FLUP, DFDT, UAVG, UU, U0U, ALBMED,
-     &                   TRNMED )
+     &                   FISOT,LAMBER, ALBEDO, HL, BTEMP, TTEMP, TEMIS,
+     &                   DELTAM, sccos, PLANK, ONLYFL, ACCUR, PRNT, 
+     &                   HEADER, MAXCLY, MAXULV, MAXUMU, MAXCMU, MAXPHI, 
+     &                   RFLDIR, RFLDN, FLUP, fldir, fldn, dirscale,
+     &                   DFDT, UAVG, UU, U0U, ALBMED, TRNMED )
          DO 3950 LEV = 0, NLAYERS
-            DIRDOWN(LEV) = DIRDOWN(LEV) + RFLDIR(NLAYERS-LEV+1)
-            DIFDOWN(LEV) = DIFDOWN(LEV) + RFLDN(NLAYERS-LEV+1)
+C     Sum up either actual downward fluxes (IDELM=0) or delta-M scaled
+C     downward fluxes.
+            if (idelm .eq. 0) then
+               DIRDOWN(LEV) = DIRDOWN(LEV) + RFLDIR(NLAYERS-LEV+1)
+               DIFDOWN(LEV) = DIFDOWN(LEV) + RFLDN(NLAYERS-LEV+1)
+            else
+               DIRDOWN(LEV) = DIRDOWN(LEV) + FLDIR(NLAYERS-LEV+1)
+               DIFDOWN(LEV) = DIFDOWN(LEV) + FLDN(NLAYERS-LEV+1)
+            endif
             TOTUFLUX(LEV) = TOTUFLUX(LEV) + FLUP(NLAYERS-LEV+1)
  3950    CONTINUE
 
@@ -188,10 +198,12 @@ C ***    Downward radiative transfer.
  6000 CONTINUE
 
       DIFDOWN(NLAYERS) = 0.
+      if (isccos .eq. 2) DIRDOWN(NLAYERS) = DIRDOWN(NLAYERS)/DIRSCALE
       TOTDFLUX(NLAYERS) = DIRDOWN(NLAYERS)
       FNET(NLAYERS) = TOTDFLUX(NLAYERS) - TOTUFLUX(NLAYERS)
       HTR(NLAYERS) = 0.
       DO 3951 LEV = NLAYERS-1, 0, -1
+         if (isccos .eq. 2) DIRDOWN(LEV) =  DIRDOWN(LEV)/DIRSCALE
          TOTDFLUX(LEV) =  DIRDOWN(LEV) + DIFDOWN(LEV)
          FNET(LEV) = TOTDFLUX(LEV) - TOTUFLUX(LEV)
          HTR(LEV) = -HEATFAC * (FNET(LEV) -FNET(LEV+1)) /
