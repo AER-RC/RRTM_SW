@@ -37,11 +37,15 @@ C     per g-value per band.
       COMMON /OUTPUT/    TOTUFLUX(0:MXLAY), TOTDFLUX(0:MXLAY),
      &                   DIFDOWN(0:MXLAY), DIRDOWN(0:MXLAY),
      &                   FNET(0:MXLAY), HTR(0:MXLAY)
-      COMMON /HVERSN/    HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*8 HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
                                        
       DIMENSION BBD1(MXLAY),BBD2(MXLAY),BBD3(MXLAY)
       DIMENSION WTNUM(MXANG)
@@ -61,9 +65,10 @@ C     per g-value per band.
      &          UMU( MUMU ), UTAU( MXLAY ),
      &          UU( MUMU, MXLAY, MPHI ),fldir(mxlay),fldn(mxlay)
       DIMENSION PHASERAY(0:MXSTR)
-      HVRRTR = '%I%'
       DATA PRNT /.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.,
      &     .FALSE.,.FALSE./
+
+      HVRRTR = '$Revision$'  
 
       sccos = .false.
       if (isccos .gt. 0) sccos = .true.

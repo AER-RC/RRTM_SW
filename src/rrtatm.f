@@ -1,7 +1,7 @@
-C     path:      /home/rc1/aer_lblrtm/src/SCCS/s.lblatm.f                       
-C     revision:  3.18                                                           
-C     created:   11/10/97  09:02:13                                             
-C     presently: 11/11/97  11:21:55                                             
+C     path:      $Source$
+C     author:    $Author$
+C     revision:  $Revision$
+C     created:   $Date$
       SUBROUTINE RRTATM
 C
 C     This routine has been modified from lblatm.f for use with RRTM,
@@ -81,8 +81,10 @@ C                                                                        FA00520
 C                                                                        FA00630
       DOUBLE PRECISION XID,SECANT,HMOLID,XALTZ,YID                      &FA00640
 C                                                                        FA00650
-      COMMON /HVERSN/  HVRLBL,HVRCNT,HVRFFT,HVRATM,HVRLOW,HVRNCG,               
-     *                HVROPR,HVRPST,HVRPLT,HVRTST,HVRUTL,HVRXMR                 
+      COMMON /HVERSN/ HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                HVDUM1(4),HVRUTL,HVREXT,
+     *                HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR             
       COMMON /FILHDR/ XID(10),SECANT,PAVE,TAVE,HMOLID(60),XALTZ(4),      FA00660
      *                WK(60),PZL,PZU,TZL,TZU,WN2   ,DV ,V1 ,V2 ,TBOUND,  FA00670
      *                EMISIV,FSCDID(17),NMOL,LAYER ,YI1,YID(10),LSTWDF   FA00680
@@ -94,8 +96,10 @@ C                                                                        FA00730
       COMMON /HMOLS/ HMOLS(MXMOL),JUNIT(MXMOL),WMOL(MXMOL),JUNITP,       FA00740
      *               JUNITT                                              FA00750
       COMMON /HMOLC/ HMOLC(MXMOL)                                        FA00760
-      CHARACTER*8 HVRLBL,HVRCNT,HVRFFT,HVRATM,HVRLOW,HVRNCG,HVROPR,             
-     *            HVRPLT,HVRPST,HVRTST,HVRUTL,HVRXMR                            
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *             HVDUM1,HVRUTL,HVREXT,
+     *             HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *             HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       CHARACTER*8 HMOLC                                                  FA00770
 C                                                                        FA00780
 C     ********************************************************           FA00790
@@ -130,7 +134,7 @@ C
 C                                                                               
 C     ASSIGN SCCS VERSION NUMBER TO MODULE                                      
 C                                                                               
-      HVRATM = '3.18'                                                           
+      HVRRTM = '$Revision$'      
 C                                                                        FA01050
 C     IBDIM IS THE MAXIMUM NUMBER OF LAYERS FOR OUTPUT TO LBLRTM         FA01060
 C     IOUTDM IS THE MAXIMUN NUMBER OF OUTPUT LAYERS                      FA01070

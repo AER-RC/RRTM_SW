@@ -62,14 +62,19 @@ C        level and the heating rate for each layer
       COMMON /OUTPUT/    TOTUFLUX(0:MXLAY), TOTDFLUX(0:MXLAY),
      &                   DIFDOWNFLUX(0:MXLAY), DIRDOWNFLUX(0:MXLAY),
      &                   FNET(0:MXLAY), HTR(0:MXLAY)
-      COMMON /HVERSN/    HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVDUM1(4),HVRUTL,HVREXT
+      COMMON /HVERSN/    HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVDUM1(4),HVRUTL,HVREXT,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
       COMMON /HVRSNB/    HVRKG(IB1:IB2)
 
 
-      CHARACTER*8 HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT
-      CHARACTER*8 HVRKG
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRKG
       CHARACTER PAGE
 
       CHARACTER*50 OUTFORM(7)
@@ -84,6 +89,8 @@ c     Setup format statements for output
      5 '(1X,I3,5X,F5.2,4X,4(F10.4,4X),F10.4,4X,F10.5)',
      6 '(1X,I3,5X,F5.1,4X,4(F10.4,4X),F10.4,4X,F10.5)',
      7 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F10.4,4X,F10.5)'/
+
+      HVRRTM = '$Revision$'      
 
       IDIS = 1
 
@@ -135,6 +142,7 @@ C ***    Process output for this atmosphere.
             IEND = IEND-1
             ISTART = IB2
          ENDIF
+
          if (isccos .eq. 1) write(iwr,9880) 
          if (isccos .eq. 2) write(iwr,9881) 
          if (idelm .ne. 0) write(iwr,9882) 
@@ -179,8 +187,12 @@ C
 C
 C ***    Output module version numbers
 C
-         WRITE(IWR,9910) HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                   HVRUTL,HVREXT,(HVRKG(NB),NB=IB1,IB2),HVRKG(27)
+         WRITE(IWR,9910) HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                   HVRUTL,
+     *                   HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                   HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR,HVREXT,
+     *                   (HVRKG(NB),NB=16,25),(HVRKG(NB),NB=27,29)
+
          CLOSE(IWR)
 
  4000 CONTINUE
@@ -199,23 +211,22 @@ C
  9902 FORMAT(1X,I3,3X,F11.6,4X,1P,2(G12.6,2X),G13.6,3X,G16.9,0P)
  9903 FORMAT(A)
  9910 FORMAT('  Modules and versions used in this calculation:',/,/,5X,
-     *        '    rrtm.f: ',6X,A8,10X, ' rtreg.f: ',6X,A8,/,5X,
-     *        '     rtr.f: ',6X,A8,10X, 'rrtatm.f: ',6X,A8,/,5X,
-     *        ' setcoef.f: ',6X,A8,10X, 'taumol.f: ',6X,A8,/,5X,
-     *        'util_xxx.f: ',6X,A8,10X, ' extra.f: ',6X,A8,/,5X,
-     *        '  k_gB01.f: ',6X,A8,10X, 'k_gB02.f: ',6X,A8,/,5X,
-     *        '  k_gB03.f: ',6X,A8,10X, 'k_gB04.f: ',6X,A8,/,5X,
-     *        '  k_gB05.f: ',6X,A8,10X, 'k_gB06.f: ',6X,A8,/,5X,
-     *        '  k_gB07.f: ',6X,A8,10X, 'k_gB08.f: ',6X,A8,/,5X,
-     *        '  k_gB09.f: ',6X,A8,10X, 'k_gB10.f: ',6X,A8,/,5X,
-     *        '  k_gB11.f: ',6X,A8,10X, 'k_gB12.f: ',6X,A8,/,5X,
-     *        '  k_gB13.f: ',6X,A8,10X, 'k_gB14.f: ',6X,A8,/,5X,
-     *        '  k_gB15.f: ',6X,A8,10X, 'k_gB16.f: ',6X,A8,/,5X,
-     *        '  k_gB17.f: ',6X,A8,10X, 'k_gB18.f: ',6X,A8,/,5X,
-     *        '  k_gB19.f: ',6X,A8,10X, 'k_gB20.f: ',6X,A8,/,5X,
-     *        '  k_gB21.f: ',6X,A8,10X, 'k_gB22.f: ',6X,A8,/,5X,
-     *        '  k_gB23.f: ',6X,A8,10X, 'k_gB24.f: ',6X,A8,/,5X,
-     *        '  k_gB25.f: ',6X,A8,10X, 'k_gB27.f: ',6X,A8,/,5X/)
+     *       '       rrtm.f: ',4X,A15,10X,'    rtrdis.f: ',6X,A15,/,5X,
+     *       '     rrtatm.f: ',4X,A15,10X,'   setcoef.f: ',6X,A15,/,5X,
+     *       '  taumoldis.f: ',4X,A15,10X,'   util_xx.f: ',6X,A15,/,5X,
+     *       '     D1MACH.f: ',4X,A15,10X,'    R1MACH.f: ',6X,A15,/,5X,
+     *       '    ErrPack.f: ',4X,A15,10X,'    LINPAK.f: ',6X,A15,/,5X,
+     *       '    aerprop.f: ',4X,A15,10X,'bkdata_aer.f: ',6X,A15,/,5X,
+     *       'nkdata_band.f: ',4X,A15,10X,'cldprop_sw.f: ',6X,A15,/,5X,
+     *       '     disort.f: ',4X,A15,10X,'get_lambda.f: ',6X,A15,/,5X,
+     *       '      param.f: ',4X,A15,10X,'     extra.f: ',6X,A15,/,5X,
+     *                                    '    k_gB16.f: ',4X,A15,/,5X,
+     *       '     k_gB17.f: ',4X,A15,10X,'    k_gB18.f: ',4X,A15,/,5X,
+     *       '     k_gB19.f: ',4X,A15,10X,'    k_gB20.f: ',4X,A15,/,5X,
+     *       '     k_gB21.f: ',4X,A15,10X,'    k_gB22.f: ',4X,A15,/,5X,
+     *       '     k_gB23.f: ',4X,A15,10X,'    k_gB24.f: ',4X,A15,/,5X,
+     *       '     k_gB25.f: ',4X,A15,10X,'    k_gB27.f: ',4X,A15,/,5X,
+     *       '     k_gB28.f: ',4X,A15,10X,'    k_gB29.f: ',4X,A15,/)
 
       STOP
       END
@@ -729,18 +740,33 @@ c   use Iqbal's equation 1.2.1
 *****************************************************************
       BLOCK DATA
 
-      COMMON /HVERSN/ HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *                HVDUM1(4),HVRUTL,HVREXT
+      COMMON /HVERSN/ HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *                HVDUM1(4),HVRUTL,HVREXT,
+     *                HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *                HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
 
-      CHARACTER*8 HVRRTM,HVRREG,HVRRTR,HVRATM,HVRSET,HVRTAU,
-     *            HVDUM1,HVRUTL,HVREXT
+      COMMON /HVRSNB/    HVRKG(16:29)
 
-      DATA HVRRTM / '%I%' /,        HVRREG / 'NOT USED' /,
+      CHARACTER*15 HVRRTM,HVRRTR,HVRATM,HVRSET,HVRTAU,
+     *            HVDUM1,HVRUTL,HVREXT,
+     *            HVRD1M,HVRR1M,HVREPK,HVRLPK,HVRAER,HVRBKA,
+     *            HVRBKB,HVRCLD,HVRDIS,HVRLAM,HVRPAR
+
+      CHARACTER*15 HVRKG(16:29)
+
+      DATA HVRRTM / 'NOT USED' /,  
      *     HVRRTR / 'NOT USED' /,   HVRATM / 'NOT USED' /,
      *     HVRSET / 'NOT USED' /,   HVRTAU / 'NOT USED' /,
      *     HVDUM1 / 4*'NOT USED' /, HVRUTL / 'NOT USED' /,
-     *     HVREXT / 'NOT USED' /
+     *     HVREXT / 'NOT USED' /, 
+     *     HVRD1M / 'NOT USED' /,   HVRR1M / 'NOT USED' /,
+     *     HVREPK / 'NOT USED' /,   HVRLPK / 'NOT USED' /,
+     *     HVRAER / 'NOT USED' /,   HVRBKA / 'NOT USED' /,
+     *     HVRBKB / 'NOT USED' /,   HVRCLD / 'NOT USED' /,
+     *     HVRDIS / 'NOT USED' /,   HVRLAM / 'NOT USED' /,
+     *     HVRPAR / 'NOT USED' /
 
+      DATA HVRKG /14*'NOT USED' /
 
       END
 
