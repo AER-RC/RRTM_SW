@@ -142,7 +142,7 @@ c     Setup format statements for output
      4 '(1X,I3,4X,F6.3,4X,4(F10.4,4X),F11.6,4X,F10.5)',
      5 '(1X,I3,4X,F6.2,4X,4(F10.4,4X),F11.6,4X,F10.5)',
      6 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F11.6,4X,F10.5)',
-     7 '(1X,I3,5X,F5.0,4X,4(F10.4,4X),F11.6,4X,F10.5)'/
+     7 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F11.6,4X,F10.5)'/
 
       PAGE = CHAR(12)
 
@@ -279,10 +279,10 @@ C ***    Output module version numbers
  4000 CONTINUE
 
  9879 format(1x)
- 9880 format(1x,'All output fluxes have been adjusted to account for ins
-     &trumental cosine response.') 
- 9881 format(1x,'The output diffuse fluxes have been adjusted to account
-     & for instrumental cosine response.') 
+ 9880 format(1x,'All output fluxes adjusted to account for ins
+     &trumental cosine response; heating rates invalid')
+ 9881 format(1x,'The output diffuse fluxes adjusted to account
+     & for instrumental cosine response; heating rates invalid')
 
  9882 format(1x,'The downwelling direct and diffuse fluxes have been com
      &puted using the delta-M scaling approximation.') 
