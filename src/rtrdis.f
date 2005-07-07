@@ -88,8 +88,10 @@ C     per g-value per band.
 
       HVRRTR = '$Revision$'  
 
-      sccos = .false.
-      if (isccos .gt. 0) sccos = .true.
+      SCCOS = .FALSE.
+      IF (ISCCOS .GT. 0) SCCOS = .TRUE.
+
+      IF (IDELM .EQ. 0) DIRSCALE = 1.
 
       PHASERAY(0) = 1.0
       PHASERAY(1) = 0. 
@@ -234,7 +236,7 @@ C     unscaled fluxes.
             IF (IDELM .EQ. 0) THEN
                TOTDFLX = FLDIR(NLAYERS-LEV+1) + FLDN(NLAYERS-LEV+1)
                IF (LEV .EQ. NLAYERS) THEN
-                  DIRFLUX = FBEAM * UMU0
+                  DIRFLUX = FBEAM * UMU0 * DIRSCALE
                ELSE
                   TAUORIG = TAUG(LEV+1,IG) + 
      &                 TAUAER(LEV+1,IBAND) + TAUCLDORIG(LEV+1,IB)
@@ -309,6 +311,4 @@ c     User requires output from only the broadband
 
       RETURN
       END   
-
-
 
