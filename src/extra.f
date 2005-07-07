@@ -40,9 +40,9 @@ C                                                                         E00280
      *                IXFORM(5,MXMOL),
      *                XSMASS(MXMOL),XDOPLR(5,MXMOL),NUMXS,IXSBIN          E00325
 
-      COMMON /CVREXT/    HVREXT
+      COMMON /CVREXT/    HNAMEXT,HVREXT
 
-      CHARACTER*15       HVREXT
+      CHARACTER*18       HNAMEXT,HVREXT
 C                                                                         E00330
       DIMENSION IXFLG(MXMOL)                                              E00340
 C                                                                         E00350
@@ -184,6 +184,11 @@ C                                                                         E02060
       CHARACTER*25 CTEMP                                                  E02070
       CHARACTER*1  CTEMP1(25),BLANK                                       E02080
       EQUIVALENCE (CTEMP,CTEMP1(1))                                       E02090
+
+      COMMON /CVREXT/    HNAMEXT,HVREXT
+
+      CHARACTER*18       HNAMEXT,HVREXT
+
 C                                                                         E02100
       DATA BLANK / ' '/                                                   E02110
 C                                                                         E02120
@@ -221,6 +226,11 @@ C     THIS SUBROUTINE EXPONENTIALLY INTERPOLATES X1 AND X2 TO X BY        A10630
 C     THE FACTOR A                                                        A10640
 C**********************************************************************   A10650
 C                                                                         A10660
+
+      COMMON /CVREXT/    HNAMEXT,HVREXT
+
+      CHARACTER*18       HNAMEXT,HVREXT
+
       IF (X1.EQ.0.0.OR.X2.EQ.0.0) GO TO 10                                A10670
       X = X1*(X2/X1)**A                                                   A10680
 C                                                                         A10690

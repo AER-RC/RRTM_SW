@@ -153,6 +153,12 @@ c --------------------------------------------------------------------
       INTEGER :: I
       DOUBLE PRECISION :: B, X = 1.D0
 
+      COMMON /CVRRDI/    HNAMRDI,HVRRDI
+
+      CHARACTER*18       HNAMRDI,HVRRDI
+
+      HVRRDI = '$Revision$'
+
       B = RADIX(X)
 
       SELECT CASE (I)
