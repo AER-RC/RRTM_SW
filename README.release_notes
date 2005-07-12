@@ -1,6 +1,24 @@
 NOTE:
 ** CVS rtags can't accept "." in strings, substitute "_"
 
+July 12, 2005:
+
+	Release_2_6
+
+	Internal Release Only
+
+	* Updated revision statements in RDI1MACH.f and extra.f.  Codes
+	are compatible with rrtm_lw.
+
+	* Modified delta-m scaling variables in rtrdis.f to account for
+	cosine response option
+
+	* Text output changes and PI value change to rrtm.f
+
+	* Updated rrtatm.f to be compatible with lblatm.f CVS revision 9.3
+
+	* Updated makefiles
+
 Mid-April 2004:
 
 	Release_2_5
