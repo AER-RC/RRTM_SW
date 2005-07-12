@@ -958,7 +958,7 @@ c
       COMMON /CONSTS/ PI,PLANCK,BOLTZ,CLIGHT,AVOGAD,ALOSMT,GASCON,
      *                RADCN1,RADCN2 
 c
-      DATA PI / 3.1415927410125732 /
+      DATA PI / 3.14159265 /
 c
 c    Constants from NIST 01/11/2002
 c
