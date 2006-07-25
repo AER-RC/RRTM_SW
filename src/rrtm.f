@@ -391,12 +391,6 @@ C     No cross-sections implemented in shortwave.
          STOP
       ENDIF
 
-      IF (IAER.EQ.10) CALL READAER
-
-C     If clouds are present, read in appropriate input file, IN_CLD_RRTM.
-      IF (ICLD .EQ. 1) CALL READCLD
-
-
       READ (IRD,9020) JULDAT, SZA, ISOLVAR, (SOLVAR(IB),IB=IB1,IB2)
 
       ZENITH = COS(SZA * PI / 180.)
@@ -405,6 +399,13 @@ C     If clouds are present, read in appropriate input file, IN_CLD_RRTM.
       ELSE
          ADJFLUX_JD = EARTH_SUN (JULDAT)
       ENDIF
+
+C     If clouds are present, read in appropriate input file, IN_CLD_RRTM.
+      IF (ICLD .EQ. 1) CALL READCLD
+
+C     If aerosols are present, read in appropriate input file, IN_AER_RRTM.
+      IF (IAER.EQ.10) CALL READAER 
+
 
       IF (ISOLVAR .EQ. 0) THEN
          DO 1400 IB = IB1,IB2
@@ -613,7 +614,7 @@ C     cloudy layers to process.
 
 C************************  SUBROUTINE READAER  *****************************C
 
-      SUBROUTINE READAER
+      SUBROUTINE READAER 
 
 C     Purpose:  To read in IN_AER_RRTM, the file that contains input
 C               aerosol properties.
@@ -621,32 +622,37 @@ C               aerosol properties.
       INCLUDE 	'param.f'
       PARAMETER (MCMU = 32)
       real aerpar(3), ssa(nbands), asym(nbands), aod(mxlay),aod1(nbands)
-      real rl1(nbands), rl2(nbands), rlambda(nbands), specfac(nbands)
+      real rlambda(nbands), specfac(nbands)
+      real rnu0(16:29),rnu1(23:26)
+      real f1(23:26),od0(23:26),od1(23:26)
+      integer lay(mxlay),ivec(mxlay)
 
       COMMON /CONTROL/   IAER, NSTR, IOUT, ISTART, IEND, ICLD,
      &                   idelm, isccos
       COMMON /PROFILE/   NLAYERS,PAVEL(MXLAY),TAVEL(MXLAY),
      &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
+      COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX(NBANDS)
       common /AERDAT/    ssaaer(mxlay,nbands), phase(mcmu,mxlay,nbands), 
      &                   tauaer(mxlay,nbands)
       CHARACTER*1 CTEST, CPERCENT
 
       DATA CPERCENT /'%'/
 
-      integer lay(mxlay)
+      data rnu0 /2903.,3601.,4310.,4892.,5623.,6872.,7872.,
+     &               10590.,14420.,18970.,25015.,30390.,43507.,1412./
+
+       data rnu1 /10530.7,14293.3,18678.0,24475.1/
+
+       data f1/0.9929,0.9883,0.978,0.9696/
+       data od0/0.1084,0.167,0.245,0.3611/
+       data od1 /0.3144,0.4822,0.7013,1.0239/
 
       eps = 1.e-10
       IRDAER = 12
       OPEN(IRDAER,FILE='IN_AER_RRTM',FORM='FORMATTED')
 
-      do ib = ib1, ib2
-         DO 500 ILAY = 1, MXLAY
-            AOD(ILAY) = 0.
-            tauaer(ILAY,ib) = 0.
- 500     CONTINUE
-         rl1(ib) = 10000. / wavenum1(ib)	
-         rl2(ib) = 10000. / wavenum2(ib)	
-      enddo
+      aod(:) = 0.0
+      tauaer(:,ib1:ib2) = 0.0
 
 C     Read in number of different aerosol models option.
       read (irdaer, 9010) naer
@@ -654,7 +660,7 @@ c      if (naer .gt. 4) then
 c         print *, 'NAER (= ', naer, ') IS GREATER THAN 4'
 c         stop
 c      endif
-        
+
 c     For each aerosol read in optical properties and layer aerosol 
 c     optical depths.
       do ia = 1, naer
@@ -664,25 +670,14 @@ c     optical depths.
 c           Set defaults to get standard Angstrom relation.
             if (aerpar(2) .lt. eps) aerpar(2) = 1.
 
-            omaer  = 1. - aerpar(1)
             do ib = ib1, ib2
-               if (omaer .ne. 0.) then
-                  factor = 1. / omaer
-                  aodbar = factor *(rl2(ib)**omaer - rl1(ib)**omaer)/ 
-     &                 (rl2(ib) - rl1(ib))
-               else
-                  aodbar = alog(rl2(ib)/rl1(ib))/(rl2(ib) - rl1(ib))
-               endif
-               if (aerpar(1) .ne. 0.) then
-                  rlambda(ib) = (1. / aodbar) ** (1./ aerpar(1))
-               else
-                  rlambda(ib) = 1.0
-               endif
+	       rlambda(ib)=10000./rnu0(ib)
                specfac(ib) = (aerpar(2) + aerpar(3) * rlambda(ib)) /
      &              ((aerpar(2) + aerpar(3) - 1.) + 
      &              rlambda(ib)**aerpar(1))
             enddo
          endif
+
 C        For this aerosol, read in layers and optical depth information.
 C        Store a nonzero optical depth in aod to check for double
 C        specification.
@@ -692,7 +687,7 @@ C        specification.
                if (iaod .eq. 0) then
                   aod(lay(il)) = aod1(ib1)
                   do ib = ib1, ib2
-                     tauaer(lay(il),ib) = aod1(ib1) * specfac(ib)
+                     tauaer(lay(il),ib) = aod(lay(il)) * specfac(ib)
                   enddo
                else
                   do ib = ib1, ib2
@@ -707,6 +702,27 @@ C        specification.
             endif
          enddo
 
+c      Build vector of aerosol layer indices 
+
+       do il=1,nlay
+          ivec(il) = lay(il) 
+       end do
+
+c      Correct bands 23 through 26 for sza effect (negligible for others)
+         do ib=23,26
+            if (iaod.eq.0) then
+                od = sum(tauaer(ivec(1:nlay),ib))/zenith
+                rnu = rnu0(ib)+
+     &           (rnu1(ib)-rnu0(ib))*(od-od0(ib))/(od1(ib)-od0(ib))
+               rlambda_new=10000./rnu
+               specfac_new = (aerpar(2)+aerpar(3)*rlambda_new) /
+     &          ((aerpar(2)+aerpar(3)- 1.)+rlambda_new**aerpar(1))
+               do il=1,nlay
+                  tauaer(lay(il),ib) = tauaer(lay(il),ib)*
+     &			specfac_new/specfac(ib)
+               end do
+            endif
+         end do
 
 c        For this aerosol, read and store optical properties
          read (irdaer, 9013) (ssa(ib), ib = ib1,ib2)
@@ -744,7 +760,7 @@ c        For this aerosol, read and store optical properties
             enddo
          endif
 
-      enddo
+      enddo    ! end of naer loop
 
 
  9000 CONTINUE
