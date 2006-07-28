@@ -1890,6 +1890,8 @@ C     vapor self-continuum is interpolated (in temperature) separately.
      &           FAC011 * ABSA(IND1+9,IG) +
      &           FAC111 * ABSA(IND1+10,IG))
      &           + TAURAY
+	    IF (TAUG(LAY,IG) - TAURAY .LT. 0.0)
+     &		 TAUG(LAY,IG) = TAURAY
             SSA(LAY,IG) = TAURAY/TAUG(LAY,IG)
  2000    CONTINUE
  2500 CONTINUE
