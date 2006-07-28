@@ -1,6 +1,27 @@
 NOTE:
 ** CVS rtags can't accept "." in strings, substitute "_"
 
+July 2006:
+
+	Release_2_7
+
+	Internal Release Only
+
+	* Modified READAER routine in rrtm.f: Wavelength for calculation of aerosol optical depth
+	in each band is now fixed, rather than calculated for each run.  The fixed wavelength was 
+	determined from comparisons with CHARTS runs.  This wavelength is slightly modified 
+	according to the opacity of the aerosol layer.
+
+	* Updated the water vapor continuum to be consistent with MT_CKD.  
+	lblrtm_v9.4_f90_pgi_linux_sgl (mt_ckd_1.2), linefile aer_v_1.0 and lnfl_v2.1 were used 
+	for this update.
+
+	* Modified Band 28 in taumoldis.f to set the optical depth to "TAURAY" only when the
+	gaseous optical depth contribution is negative.  This will happen for extreme (cold)
+	atmospheres.
+
+	* Increased maximum number of computational layers allowed by disort.f
+
 July 12, 2005:
 
 	Release_2_6
