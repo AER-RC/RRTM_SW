@@ -8,7 +8,7 @@ SHELL = /bin/sh
 ###############################
 
 PLATFORM = sun
-VERSION = v2.7
+VERSION = v2.7.1
 
 FC = f90
 FCFLAG =  -fast -xtypemap=real:64,double:64,integer:64
