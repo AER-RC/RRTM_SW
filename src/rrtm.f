@@ -535,7 +535,7 @@ C     Test for mixing ratio input.
  9011 FORMAT (18X,I2,29X,I1,32X,I1,1X,I1,2X,I3,4X,I1,3x,i1,i1)
  9012 FORMAT (11X,I1,2X,I1,14F5.3)
  9013 FORMAT (1X,I1,I3,I5)                                     
- 9020 format (12X, I3, 3X, F7.4, 4X, I1,14F5.3)
+ 9020 format (12X, I3, 3X, F7.4, 4X, I1,14F7.5)
  9300 FORMAT (I5)
  9301 FORMAT (1X,I1)
 
