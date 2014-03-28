@@ -1,0 +1,44 @@
+March 2010
+
+* Add two more digits to the read statement for the SOLVAR variable (9020 in rrtm.f).  
+
+July 2005
+
+* Simplify the update and release notes procedure.  No longer have update file
+by version number.
+
+April 2004
+
+CVS check-in procedure prior to public release
+
+* Check in all revised/new codes (*.f) in the src directory.
+
+* Check in all revised/new makefiles in the makefiles directory.  These
+should be updated for every release since the version number changes!
+
+* Check in revised rrtm_sw_instructions
+	* Make sure the date on the top of the instruction file reflects
+	release month.
+
+* Check in README.release_notes
+	* This file IS NOT released to the public, but serves as internal
+	notice of update purpose/revisions.
+
+* Remove update_rrtm_sw_v**previous version**.txt from the archive
+	* cvs remove -f update_rrtm_sw_v**previous version**.txt
+	* cvs commit -m "Removed old update notice" update_rrtm_sw_v**previous version**.txt
+ 
+* Check in update_rrtm_sw_v**.txt
+	* This file is released to the public.  Should be revised for each
+	release to contain updates and the new code version number.
+	* cvs add update_rrtm_sw_v**.txt
+	* cvs commit -m "Add new update notice" update_rrtm_sw_v**.txt
+
+* Make sure all files in "example_runs" directory are cleaned up...that is,
+remove all ~files.
+
+* Run script_build_rrtm_sw.pl to build the source code and example tar files
+for the web-site.
+
+	** MAKE SURE to change the build script to have the proper version 
+	number
