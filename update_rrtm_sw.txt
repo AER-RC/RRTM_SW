@@ -1,4 +1,17 @@
-*** Update notice for Release RRTM_SW v2.6 ***
+March 2014
+
+	Release 2_7_2
+      
+        Internal Release (also sent to Netsanet)
+
+        rrtm.f: modified one line to allow comppiling with gfortran
+
+        makefiles: now linked to util_xxx.f90
+                   added makefile for gfortran
+
+        Note: to get good executables need to compile and run on anvil. pgf90
+	 code runs all test cases successfully, gfortran crashes on tropical ice cloud
+	 case
 
 March 2010:
 
