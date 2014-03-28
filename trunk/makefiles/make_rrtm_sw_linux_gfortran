@@ -1,0 +1,186 @@
+# $Id: make_rrtm_sw_linux_pgi,v 1.2 2004/04/16 19:30:55 jdelamer Exp $
+# Makefile for rrtm_sw - linux platform with Portland Group Compiler
+
+SHELL = /bin/sh
+
+###############################
+# Set variables
+###############################
+
+PLATFORM = gfortran
+VERSION = v2.7.2
+
+FC = gfortran
+FCFLAG =  -fdefault-integer-8 -fdefault-real-8 -frecord-marker=4
+OUTPUT = rrtm_sw_$(PLATFORM)_$(VERSION)
+CPATH = src
+CDOTO = $(PLATFORM)_$(FC)_dbl.o
+    
+CRTM = rrtm
+CSET = setcoef
+CATM = rrtatm
+CUTL = util_$(PLATFORM)
+CTAU = taumoldis
+CCLD = cldprop
+CEXT = extra
+CKGS = k_g
+CRTR = rtrdis
+CRDI = RDI1MACH
+CERR = ErrPack
+CLPK = LINPAK
+CDIS = disort
+
+OBJFIL = $(CRTM).o \
+	 $(CRDI).o \
+	 $(CRTR).o \
+	 $(CATM).o \
+	 $(CSET).o \
+	 $(CTAU).o \
+	 $(CERR).o \
+	 $(CUTL).o \
+	 $(CEXT).o \
+	 $(CLPK).o \
+	 $(CDIS).o \
+	 $(CCLD).o \
+	 $(CKGS).o 
+
+OBPATH = $(CDOTO)/$(CRTM).o \
+	 $(CDOTO)/$(CRDI).o \
+	 $(CDOTO)/$(CRTR).o \
+	 $(CDOTO)/$(CATM).o \
+	 $(CDOTO)/$(CSET).o \
+	 $(CDOTO)/$(CTAU).o \
+	 $(CDOTO)/$(CERR).o \
+	 $(CDOTO)/$(CUTL).o \
+	 $(CDOTO)/$(CEXT).o \
+	 $(CDOTO)/$(CLPK).o \
+	 $(CDOTO)/$(CDIS).o \
+	 $(CDOTO)/$(CCLD).o \
+	 $(CDOTO)/$(CKGS).o 
+
+MODULE = $(CPATH)/$(CRTM).o \
+	 $(CPATH)/$(CRDI).o \
+	 $(CPATH)/$(CRTR).o \
+	 $(CPATH)/$(CATM).o \
+	 $(CPATH)/$(CSET).o \
+	 $(CPATH)/$(CTAU).o \
+	 $(CPATH)/$(CERR).o \
+	 $(CPATH)/$(CUTL).o \
+	 $(CPATH)/$(CEXT).o \
+	 $(CPATH)/$(CLPK).o \
+	 $(CPATH)/$(CDIS).o \
+	 $(CPATH)/$(CCLD).o \
+	 $(CPATH)/$(CKGS).o 
+
+###############################
+# Load line
+###############################
+
+$(OUTPUT) : \
+	intro makedir $(OBPATH) conclude
+	$(FC) $(FCFLAG) -o $(OUTPUT) $(OBPATH)
+
+###############################
+# Object compile lines
+###############################
+
+$(CDOTO)/$(CRTM).o : $(CPATH)/$(CRTM).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CRTM).f
+	\mv $(CRTM).o $(CDOTO)
+
+$(CDOTO)/$(CRTR).o : $(CPATH)/$(CRTR).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CRTR).f
+	\mv $(CRTR).o $(CDOTO)
+
+$(CDOTO)/$(CRDI).o : $(CPATH)/$(CRDI).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CRDI).f
+	\mv $(CRDI).o $(CDOTO)
+
+$(CDOTO)/$(CATM).o : $(CPATH)/$(CATM).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CATM).f
+	\mv $(CATM).o $(CDOTO)
+
+$(CDOTO)/$(CSET).o : $(CPATH)/$(CSET).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CSET).f
+	\mv $(CSET).o $(CDOTO)
+
+$(CDOTO)/$(CTAU).o : $(CPATH)/$(CTAU).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CTAU).f
+	\mv $(CTAU).o $(CDOTO)
+
+$(CDOTO)/$(CERR).o : $(CPATH)/$(CERR).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CERR).f
+	\mv $(CERR).o $(CDOTO)
+
+$(CDOTO)/$(CUTL).o : $(CPATH)/$(CUTL).f90
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CUTL).f90
+	\mv $(CUTL).o $(CDOTO)
+
+$(CDOTO)/$(CEXT).o : $(CPATH)/$(CEXT).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CEXT).f
+	\mv $(CEXT).o $(CDOTO)
+
+$(CDOTO)/$(CLPK).o : $(CPATH)/$(CLPK).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CLPK).f
+	\mv $(CLPK).o $(CDOTO)
+
+$(CDOTO)/$(CDIS).o : $(CPATH)/$(CDIS).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CDIS).f
+	\mv $(CDIS).o $(CDOTO)
+
+$(CDOTO)/$(CCLD).o : $(CPATH)/$(CCLD).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CCLD).f
+	\mv $(CCLD).o $(CDOTO)
+
+$(CDOTO)/$(CKGS).o : $(CPATH)/$(CKGS).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CKGS).f
+	\mv $(CKGS).o $(CDOTO)
+
+###############################
+# Create object file directory
+###############################
+
+makedir :
+	if [ ! -d $(CDOTO) ] ; \
+	then \
+	   mkdir $(CDOTO) ; \
+	fi
+
+
+###############################
+# Intro information
+###############################
+
+.SILENT:
+intro :
+	echo
+	echo '-----------------'
+	echo '  $(OUTPUT) Makefile'
+	echo '-----------------'
+	echo
+	echo 'This Makefile was designed for the $(PLATFORM) platform.'
+	echo
+	echo 'It uses the $(FC) compiler, with the following options:'
+	echo '      $(FCFLAG)'
+	echo
+	echo 'The object files used are as follows:'
+	echo
+	echo '      $(OBJFIL)'
+	echo
+	echo
+	echo '$(OUTPUT) make in progress ...'
+	echo
+
+
+
+###############################
+# Concluding information
+###############################
+
+conclude :
+	echo
+	echo '================='
+	echo '  Makefile done'
+	echo '================='
+
+

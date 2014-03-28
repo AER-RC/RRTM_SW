@@ -1,0 +1,184 @@
+March 2014
+
+	Release 2_7_2
+      
+        Internal Release (also sent to Netsanet)
+
+        rrtm.f: modified one line to allow comppiling with gfortran
+
+        makefiles: now linked to util_xxx.f90
+                   added makefile for gfortran
+
+        Note: to get good executables need to compile and run on anvil. pgf90
+	 code runs all test cases successfully, gfortran crashes on tropical ice cloud
+	 case
+
+March 2010:
+
+      Release_2_7_1
+
+      Internal Release Only
+
+      * rrtm.f: Add two more digits to the read statement for the SOLVAR variable (statement 9020)
+
+July 2006:
+
+	Release_2_7
+
+	Internal Release Only
+
+	* Modified READAER routine in rrtm.f: Wavelength for calculation of aerosol optical depth
+	in each band is now fixed, rather than calculated for each run.  The fixed wavelength was 
+	determined from comparisons with CHARTS runs.  This wavelength is slightly modified 
+	according to the opacity of the aerosol layer.
+
+	* Updated the water vapor continuum to be consistent with MT_CKD.  
+	lblrtm_v9.4_f90_pgi_linux_sgl (mt_ckd_1.2), linefile aer_v_1.0 and lnfl_v2.1 were used 
+	for this update.
+
+	* Modified Band 28 in taumoldis.f to set the optical depth to "TAURAY" only when the
+	gaseous optical depth contribution is negative.  This will happen for extreme (cold)
+	atmospheres.
+
+	* Increased maximum number of computational layers allowed by disort.f
+
+July 2005:
+
+	Release_2_6
+
+	Internal Release Only
+
+	* Updated revision statements in RDI1MACH.f and extra.f.  Codes
+	are compatible with rrtm_lw.
+
+	* Modified delta-m scaling variables in rtrdis.f to account for
+	cosine response option
+
+	* Text output changes and PI value change to rrtm.f
+
+	* Updated rrtatm.f to be compatible with lblatm.f CVS revision 9.3
+
+	* Updated makefiles
+
+Mid-April 2004:
+
+	Release_2_5
+
+		* Updated DISORT v1 to DISORT v2 to be compatible with 
+		version of DISORT in the RRTM_LW code
+
+		* Improved cloud properties routine to:
+
+		a)include scattering properties of spheres, based on the 
+		parameterization by Key et al. in the STREAMER RT code.  
+	
+		b) to output a file (OUT_CLD_RRTM) with the cloud scattering 
+		properties by layer. 
+
+		c) changed name of cldprop_sw.f to cldprop.f to be 
+		consistent with RRTM_LW structure.
+
+		* Updated atmospheric properties module RRTATM to be 
+		compatible with the most recent version of LBLATM v8.1.
+	
+		* Fixed error in the last declared digits of "pi".
+	
+	 	* Removed unnecessary duplicate calculations which 
+		occurred for option IOUT=98.
+
+		* Added new solar variability option (ISOLVAR)
+
+	 	* Changed number of significant digits in the net flux 
+		output in OUTPUT_RRTM.  This was necessary for the 
+		stratospheric adjustment routine required for the Boeing 
+		project.
+	
+		* Changed format statement in subroutine readaer to allow
+	        more than 4 aerosol layers (naer, format statement 9010).
+
+        	* Updated instruction manual.
+
+		* Modified makefiles to be double precision, as required 
+		to keep robust results from DISORT.
+
+		* Added patent statement to each module.
+	 
+
+		
+October 25, 2002:
+
+	Release_2_4_1 
+
+		Bug repair in readaer subroutine in rrtm.f
+
+		Update makefiles to be consistent with other AER makefiles
+
+April, 2002
+
+	Release_2_4 - Addition of Q. Fu ice particle parameterization
+
+	To incorporate this parameterization required the explicit
+	calculation outside of disort of the delta-m scaling
+	method for all species (cloud, aerosol, gases).
+
+
+October 11, 2001
+
+	Release_2_3 - Cosine response, Delta-M method
+
+	Incorporated ability to calculate fluxes using a instrumental
+	cosine response.  
+	Incorporated ability to output either delta-m or true fluxes.
+	
+	Repaired all revision numbers and output so OUTPUT_RRTM file
+	will have CVS revision numbers.
+
+September 21, 2001:
+
+	RRTM_SW is now being officially archived in CVS.  We have
+	reconstructed a history of "release" numbers which will be
+	outlined below.
+
+
+	Release_1_0 - Direct beam model
+		Reference: "Shortwave and Longwave Enhancements
+		in the Rapid Radiative Transfer Model",
+		E.J. Mlawer and S. A. Clough
+		7th ARM Science Team Conference Proceedings 
+		Published January 1998
+
+	Release_2_0 - DISORT added to RRTM_SW
+		Reference: "Shortwave Clear-Sky Model-Measurement
+		Intercomparison using RRTM"
+		E. J. Mlawer, S. A. Clough, S. Kato
+		8th ARM Science Team Conference Proceedings 
+		Published December 1998		
+
+	Release_2_1 - Aerosols added
+		No reference
+
+		This version was distributed to Frank Evans.
+
+	Release_2_1_1 - Giver corrections
+
+		This version was distributed to Frank Evans and
+		Howard Barker.
+
+	Release_2_2 - Liquid water clouds added using Hu and Stamnes
+		      parameterization
+		No reference
+
+		This version was distributed to Judy Curry, James Pinto,
+		Dana Lane, Brian Soden,	and a Finnish group via our FTP site
+		in August 2001.
+
+September 21, 2001
+
+	Release_2_2_1 - Fixed minor bug in rrtm aerosol routine.
+
+		This version will be distributed to Tim Shippert on
+		September 21, 2001, for implementation into the 
+		broadband QME.
+		
+
+	
