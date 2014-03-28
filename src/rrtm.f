@@ -1,4 +1,4 @@
-C     path:      $Source$
+C     path:      $Source: /storm/rc1/cvsroot/rc/rrtm_sw/src/rrtm.f,v $
 C     author:    $Author$
 C     revision:  $Revision$
 C     created:   $Date$
@@ -859,7 +859,7 @@ C     earth_sun_ratio 	: square of the ratio of mean to actual Earth-Sun distanc
 
 c   use Iqbal's equation 1.2.1 
 
-	earth_sun= 1.000110 + .034221 * cos(gamma) + .001289 * sin(gamma) +
+	earth_sun= 1.000110 + .034221 * cos(gamma) + .001289*sin(gamma)+
      1                 .000719 *cos(2.*gamma) + .000077 * sin(2.*gamma)
      
 	return 
