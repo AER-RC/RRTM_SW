@@ -8,7 +8,7 @@ SHELL = /bin/sh
 ###############################
 
 PLATFORM = linux_pgi
-VERSION = v2.7.1
+VERSION = v2.7.2
 
 FC = pgf90
 FCFLAG =  -fast -r8 -i8
@@ -112,8 +112,8 @@ $(CDOTO)/$(CERR).o : $(CPATH)/$(CERR).f
 	$(FC) $(FCFLAG) -c $(CPATH)/$(CERR).f
 	\mv $(CERR).o $(CDOTO)
 
-$(CDOTO)/$(CUTL).o : $(CPATH)/$(CUTL).f
-	$(FC) $(FCFLAG) -c $(CPATH)/$(CUTL).f
+$(CDOTO)/$(CUTL).o : $(CPATH)/$(CUTL).f90
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CUTL).f90
 	\mv $(CUTL).o $(CDOTO)
 
 $(CDOTO)/$(CEXT).o : $(CPATH)/$(CEXT).f

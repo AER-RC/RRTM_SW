@@ -1,5 +1,5 @@
-# $Id$
-# Makefile for rrtm_sw - SUN platform
+# $Id: make_rrtm_sw_linux_pgi,v 1.2 2004/04/16 19:30:55 jdelamer Exp $
+# Makefile for rrtm_sw - linux platform with Portland Group Compiler
 
 SHELL = /bin/sh
 
@@ -7,11 +7,11 @@ SHELL = /bin/sh
 # Set variables
 ###############################
 
-PLATFORM = sun
+PLATFORM = gfortran
 VERSION = v2.7.2
 
-FC = f90
-FCFLAG =  -fast -xtypemap=real:64,double:64,integer:64
+FC = gfortran
+FCFLAG =  -fdefault-integer-8 -fdefault-real-8 -frecord-marker=4
 OUTPUT = rrtm_sw_$(PLATFORM)_$(VERSION)
 CPATH = src
 CDOTO = $(PLATFORM)_$(FC)_dbl.o
@@ -29,7 +29,6 @@ CRDI = RDI1MACH
 CERR = ErrPack
 CLPK = LINPAK
 CDIS = disort
-
 
 OBJFIL = $(CRTM).o \
 	 $(CRDI).o \
