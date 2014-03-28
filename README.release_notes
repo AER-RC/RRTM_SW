@@ -1,6 +1,14 @@
 NOTE:
 ** CVS rtags can't accept "." in strings, substitute "_"
 
+March 2010:
+
+      Release_2_7_1
+
+      Internal Release Only
+
+      * rrtm.f: Add two more digits to the read statement for the SOLVAR variable (statement 9020)
+
 July 2006:
 
 	Release_2_7
