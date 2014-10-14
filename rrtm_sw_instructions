@@ -75,10 +75,12 @@ C  --------------------------------------------------------------------------
 		       for the full shortwave spectrum (820-50000 cm-1), and one 
 		       for each of the 14 bands.
  
-	  ICLD   (0,1) flag for clouds   (currently not implemented)
+	  ICLD   (0,1) flag for clouds   
                   = 0  no cloudy layers in atmosphere
                   = 1  one or more cloudy layers present in atmosphere
                        (requires the presence of file IN_CLD_RRTM)
+  
+
   
   Measurement comparison flags:
           IDELM  (0,1) flag for outputting downwelling fluxes computed using the delta-M scaling approximation
@@ -497,7 +499,7 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
  24       12850-16000                   H2O,O2,O3*          O2,O3*
  25       16000-22650                    H2O,O3*             O3*
  26       22650-29000                    nothing           nothing
- 20       29000-38000                      O3                O3
+ 20       29000-38000                      O3                O3,SO2*
  28       38000-50000                     O3,O2            O3,O2
  29         820-2600                       H2O               CO2
 
