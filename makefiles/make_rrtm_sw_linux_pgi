@@ -112,8 +112,8 @@ $(CDOTO)/$(CERR).o : $(CPATH)/$(CERR).f
 	$(FC) $(FCFLAG) -c $(CPATH)/$(CERR).f
 	\mv $(CERR).o $(CDOTO)
 
-$(CDOTO)/$(CUTL).o : $(CPATH)/$(CUTL).f90
-	$(FC) $(FCFLAG) -c $(CPATH)/$(CUTL).f90
+$(CDOTO)/$(CUTL).o : $(CPATH)/$(CUTL).f
+	$(FC) $(FCFLAG) -c $(CPATH)/$(CUTL).f
 	\mv $(CUTL).o $(CDOTO)
 
 $(CDOTO)/$(CEXT).o : $(CPATH)/$(CEXT).f
