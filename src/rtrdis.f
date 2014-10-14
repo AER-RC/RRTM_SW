@@ -3,7 +3,7 @@ C     author:    $Author$
 C     revision:  $Revision$
 C     created:   $Date$
 
-      SUBROUTINE RTRDIS
+      SUBROUTINE RTRDIS_dg
 C
 C  --------------------------------------------------------------------------
 C |                                                                          |
@@ -56,7 +56,8 @@ C     per g-value per band.
      &                   DIFDOWN(0:MXLAY,0:nbands), 
      &                   DIRDOWN(0:MXLAY,0:nbands),
      &                   FNET(0:MXLAY,0:nbands), 
-     &                   HTR(0:MXLAY,0:nbands) 
+     &                   HTR(0:MXLAY,0:nbands), 
+     &                   FNET_act(0:MXLAY,0:nbands)
                                        
       COMMON /CVRRTR/    HNAMRTR,HVRRTR
 
@@ -74,12 +75,17 @@ C     per g-value per band.
      &          UMU0, WVNMHI, WVNMLO
       LOGICAL   PRNT( 7 ), sccos
       REAL      ALBMED( MUMU ), DFDT( MXLAY ), TAUREV(MXLAY),
-     &          FLUP( MXLAY ), HL( 0:MCMU ), PHI( MPHI ),
+     &          FLUP( MXLAY ), FLUP_act( MXLAY), HL( 0:MCMU ), 
+     &          PHI( MPHI ),
      &          PMOM( 0:MCMU, MXLAY ), RFLDIR( MXLAY ),
      &          RFLDN( MXLAY ), SSALB( MXLAY ), TEMPER( 0:MXLAY ),
      &          TRNMED( MUMU ), U0U( MUMU, MXLAY ), UAVG( MXLAY ),
      &          UMU( MUMU ), UTAU( MXLAY ),
-     &          UU( MUMU, MXLAY, MPHI ),fldir(mxlay),fldn(mxlay)
+     &          UU( MUMU, MXLAY, MPHI ),fldir(mxlay),fldn(mxlay),
+     &          fldn_act(mxlay),totdflux_act(0:mxlay,0:nbands),
+     &          totuflux_act(0:mxlay,0:nbands),
+     &          difdown_act(0:MXLAY,0:nbands),
+     &          dirdown_act(0:MXLAY,0:nbands)
       DIMENSION PHASERAY(0:MXSTR)
 
 
@@ -128,10 +134,15 @@ C     per g-value per band.
       SSALB(1:MXLAY) = 0.0
       PMOM(0:MCMU,1:MXLAY) = 0.0
       TOTDFLUX(0:MXLAY,0:NBANDS) = 0.0
+      TOTDFLUX_act(0:MXLAY,0:NBANDS) = 0.0
       TOTUFLUX(0:MXLAY,0:NBANDS) = 0.0
+      TOTUFLUX_act(0:MXLAY,0:NBANDS) = 0.0
       DIRDOWN(0:MXLAY,0:NBANDS) = 0.0
+      DIRDOWN_act(0:MXLAY,0:NBANDS) = 0.0
       DIFDOWN(0:MXLAY,0:NBANDS) = 0.0
+      DIFDOWN_act(0:MXLAY,0:NBANDS) = 0.0
       FNET(0:MXLAY,0:NBANDS) = 0.0
+      FNET_act(0:MXLAY,0:NBANDS) = 0.0
       HTR(0:MXLAY,0:NBANDS) = 0.0
 
 C *** Loop over frequency bands.
@@ -217,13 +228,14 @@ C ***    Downward radiative transfer.
 
  3900    CONTINUE
 
-         CALL DISORT( NLAYERS, TAUREV, SSALB, NSTR, PMOM, 
+         CALL DISORT_dg( NLAYERS, TAUREV, SSALB, NSTR, PMOM, 
      &        TEMPER, WVNMLO, WVNMHI, USRTAU, NTAU, UTAU, NSTR, 
      &        USRANG, NUMU, UMU, NPHI, PHI, IBCND, FBEAM, 
      &        UMU0, PHI0, FISOT, LAMBER, ALBEDO, BTEMP, TTEMP, 
-     &        TEMIS, DELTAM,sccos, PLANK, ONLYFL, ACCUR, PRNT, 
-     &        HEADER, MAXCLY, MAXULV, MAXUMU, MAXPHI, MAXCMU,
-     &        RFLDIR, RFLDN, FLUP, fldir, fldn, dirscale,
+     &        TEMIS, DELTAM,sccos, 
+     &        PLANK, ONLYFL, ACCUR, PRNT, HEADER, MAXCLY, 
+     &        MAXULV, MAXUMU, MAXPHI, MAXCMU, RFLDIR, RFLDN, 
+     &        FLUP, FLUP_act, fldir, fldn, fldn_act, dirscale,
      &        DFDT, UAVG, UU, ALBMED, TRNMED )
 
          DO 3950 LEV = NLAYERS, 0, -1
@@ -252,8 +264,14 @@ C     unscaled fluxes.
                DIFDOWN(LEV,IBAND) = DIFDOWN(LEV,IBAND) + 
      &              FLDN(NLAYERS-LEV+1)
             ENDIF
+            DIRDOWN_act(LEV,IBAND) = DIRDOWN_act(LEV,IBAND) + 
+     &          FLDIR(NLAYERS-LEV+1)*seczen
+            DIFDOWN_act(LEV,IBAND) = DIFDOWN_act(LEV,IBAND) + 
+     &          FLDN_act(NLAYERS-LEV+1)
             TOTUFLUX(LEV,IBAND) = TOTUFLUX(LEV,IBAND) + 
      &           FLUP(NLAYERS-LEV+1)
+            TOTUFLUX_act(LEV,IBAND) = TOTUFLUX_act(LEV,IBAND) + 
+     &           FLUP_act(NLAYERS-LEV+1)
  3950    CONTINUE
 
          IG = IG + 1
@@ -268,16 +286,23 @@ c     User requires output from only one band or from all bands
             IF (ISCCOS .EQ. 2) DIRDOWN(NLAYERS,IBAND) = 
      &        DIRDOWN(NLAYERS,IBAND)/DIRSCALE
             TOTDFLUX(NLAYERS,IBAND) = DIRDOWN(NLAYERS,IBAND)
+            TOTDFLUX_act(NLAYERS,IBAND) = DIRDOWN_act(NLAYERS,IBAND)
             FNET(NLAYERS,IBAND) = TOTDFLUX(NLAYERS,IBAND) -
      &           TOTUFLUX(NLAYERS,IBAND)
+            FNET_act(NLAYERS,IBAND) = TOTDFLUX_act(NLAYERS,IBAND) +
+     &           TOTUFLUX_act(NLAYERS,IBAND)
             HTR(NLAYERS,IBAND) = 0.0
             DO 3951 LEV = NLAYERS-1,0,-1
                IF (ISCCOS .EQ. 2) DIRDOWN(LEV,IBAND) = 
      &              DIRDOWN(LEV,IBAND)/DIRSCALE
                TOTDFLUX(LEV,IBAND) = DIFDOWN(LEV,IBAND) +
      &              DIRDOWN(LEV,IBAND)
+               TOTDFLUX_act(LEV,IBAND) = DIFDOWN_act(LEV,IBAND) +
+     &              DIRDOWN_act(LEV,IBAND)
                FNET(LEV,IBAND) = TOTDFLUX(LEV,IBAND) -
      &              TOTUFLUX(LEV,IBAND)
+               FNET_act(LEV,IBAND) = TOTDFLUX_act(LEV,IBAND) +
+     &              TOTUFLUX_act(LEV,IBAND)
                HTR(LEV,IBAND) = -HEATFAC * 
      &              (FNET(LEV,IBAND) -FNET(LEV+1,IBAND)) /
      &              (PZ(LEV) - PZ(LEV+1))
@@ -289,20 +314,32 @@ c     User requires output from only the broadband
       IF (IOUT .EQ. 0 .OR. IOUT .EQ. 98) THEN
          DIFDOWN(NLAYERS,0:NBANDS) = 0.
          DIRDOWN(NLAYERS,0) = SUM(DIRDOWN(NLAYERS,ISTART:IEND))
+         DIRDOWN_act(NLAYERS,0) = SUM(DIRDOWN_act(NLAYERS,ISTART:IEND))
          IF (ISCCOS .EQ. 2)  DIRDOWN(NLAYERS,0) = 
      &        DIRDOWN(NLAYERS,0)/DIRSCALE
          TOTDFLUX(NLAYERS,0) = DIRDOWN(NLAYERS,0)
+         TOTDFLUX_act(NLAYERS,0) = DIRDOWN_act(NLAYERS,0)
          TOTUFLUX(NLAYERS,0) = SUM(TOTUFLUX(NLAYERS,ISTART:IEND))
+         TOTUFLUX_act(NLAYERS,0) = SUM(TOTUFLUX_act(NLAYERS,ISTART:
+     &           IEND))
          FNET(NLAYERS,0) = TOTDFLUX(NLAYERS,0) - TOTUFLUX(NLAYERS,0)
+         FNET_act(NLAYERS,0) = TOTDFLUX_act(NLAYERS,0) + 
+     &           TOTUFLUX_act(NLAYERS,0)
          HTR(NLAYERS,0) = 0.0
          DO 3953 LEV = NLAYERS-1,0,-1
             TOTUFLUX(LEV,0) = SUM(TOTUFLUX(LEV,ISTART:IEND))
+            TOTUFLUX_act(LEV,0) = SUM(TOTUFLUX_act(LEV,ISTART:IEND))
             DIRDOWN(LEV,0) = SUM(DIRDOWN(LEV,ISTART:IEND))
+            DIRDOWN_act(LEV,0) = SUM(DIRDOWN_act(LEV,ISTART:IEND))
             IF (ISCCOS .EQ. 2) DIRDOWN(LEV,0) = 
      &           DIRDOWN(LEV,0)/DIRSCALE
             DIFDOWN(LEV,0) = SUM(DIFDOWN(LEV,ISTART:IEND))
+            DIFDOWN_act(LEV,0) = SUM(DIFDOWN_act(LEV,ISTART:IEND))
             TOTDFLUX(LEV,0) = DIFDOWN(LEV,0) + DIRDOWN(LEV,0)
+            TOTDFLUX_act(LEV,0) = DIFDOWN_act(LEV,0) 
+     &          + DIRDOWN_act(LEV,0)
             FNET(LEV,0) = TOTDFLUX(LEV,0) - TOTUFLUX(LEV,0)
+            FNET_act(LEV,0) = TOTDFLUX_act(LEV,0) + TOTUFLUX_act(LEV,0)
             HTR(LEV,0) = -HEATFAC * 
      &           (FNET(LEV,0) -FNET(LEV+1,0)) /
      &           (PZ(LEV) - PZ(LEV+1))
@@ -311,4 +348,3 @@ c     User requires output from only the broadband
 
       RETURN
       END   
-

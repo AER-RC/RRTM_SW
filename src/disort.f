@@ -7,14 +7,15 @@ c RCS version control information:
 c $Header$
 c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      SUBROUTINE DISORT( NLYR, DTAUC, SSALB, NMOM, PMOM, TEMPER, WVNMLO,
-     &                   WVNMHI, USRTAU, NTAU, UTAU, NSTR, USRANG, NUMU,
+      SUBROUTINE DISORT_dg
+     &    ( NLYR, DTAUC, SSALB, NMOM, PMOM, TEMPER, WVNMLO,
+     &                  WVNMHI, USRTAU, NTAU, UTAU, NSTR, USRANG, NUMU,
      &                   UMU, NPHI, PHI, IBCND, FBEAM, UMU0, PHI0,
      &                   FISOT, LAMBER, ALBEDO, BTEMP, TTEMP, TEMIS,
      &                   DELTAM,sccos, 
      &                   PLANK, ONLYFL, ACCUR, PRNT, HEADER, MAXCLY,
      &                   MAXULV, MAXUMU, MAXPHI, MAXMOM, RFLDIR, RFLDN,
-     &                   FLUP, fldir, fldn, dirscale,
+     &                FLUP, FLUP_act, fldir, fldn, fldn_act, dirscale,
      &                   DFDT, UAVG, UU, ALBMED, TRNMED )
 
 c *******************************************************************
@@ -383,12 +384,13 @@ c     .. Array Arguments ..
 
       LOGICAL   PRNT( 5 )
       REAL      ALBMED( MAXUMU ), DFDT( MAXULV ), DTAUC( MAXCLY ),
-     &          FLUP( MAXULV ), PHI( MAXPHI ), PMOM( 0:MAXMOM, MAXCLY ),
+     &          FLUP( MAXULV ), FLUP_act( MAXULV ), PHI( MAXPHI ),
+     &          PMOM( 0:MAXMOM, MAXCLY ),
      &          RFLDIR( MAXULV ), RFLDN( MAXULV ), SSALB( MAXCLY ),
      &          TEMPER( 0:MAXCLY ), TRNMED( MAXUMU ), UAVG( MAXULV ),
      &          UMU( MAXUMU ), UTAU( MAXULV ),
      &          UU( MAXUMU, MAXULV, MAXPHI ), 
-     &          fldir(maxulv),fldn(maxulv)
+     &          fldir(maxulv),fldn(maxulv),fldn_act(maxulv)
 c     ..
 c     .. Local Scalars ..
 
@@ -408,7 +410,8 @@ c     .. Local Arrays ..
      &          CBAND( MI9M2, NNLYRI ), CC( MXCMU, MXCMU ),
      &          CMU( MXCMU ), CWT( MXCMU ), DTAUCP( MXCLY ),
      &          EMU( MXUMU ), EVAL( MI ), EVECC( MXCMU, MXCMU ),
-c     &          EXPBEA( 0:MXCLY ), FLDIR( MXULV ), FLDN( MXULV ),
+c     &          EXPBEA( 0:MXCLY ), FLDIR( MXULV ), FLDN( MXULV ), 
+c     &          FLDN_act( MXULV ),
      &          EXPBEA( 0:MXCLY ), 
      &          FLYR( MXCLY ), GC( MXCMU, MXCMU, MXCLY ),
      &          GL( 0:MXCMU, MXCLY ), GU( MXUMU, MXCMU, MXCLY ),
@@ -483,7 +486,6 @@ c                            ** Be sure SLFTST sets all print flags off.
      &                TEMPER( 0 ), TTEMP, UMU( 1 ), USRANG, USRTAU,
      &                UTAU( 1 ), UMU0, WVNMHI, WVNMLO, COMPAR, DUM,
      &                DUM, DUM, DUM )
-
       END IF
 
 
@@ -533,20 +535,17 @@ c                                 ** Zero internal and output arrays
      &              MI, EVAL,
      &              MI**2, AMB, APB,
      &              NNLYRI, IPVT, Z,
-     &              MAXULV, RFLDIR, RFLDN, FLUP, UAVG, DFDT,
-     &                 fldir, fldn,
+     &              MAXULV, RFLDIR, RFLDN, FLUP, FLUP_act, UAVG, DFDT,
+     &                 fldir, fldn, fldn_act,
      &              MAXUMU, ALBMED, TRNMED,
      &              MXUMU*MXULV, U0U,
      &              MAXUMU*MAXULV*MAXPHI, UU, umu0 )
-
 c                                 ** Perform various setup operations
-
       CALL SETDIS( CMU, CWT, DELTAM, DTAUC, DTAUCP, EXPBEA, FBEAM, FLYR,
      &             GL, IBCND, LAYRU, LYRCUT, MAXMOM, MAXUMU, MXCMU,
      &             NCUT, NLYR, NTAU, NN, NSTR, PLANK, NUMU, ONLYFL,
      &             CORINT, OPRIM, PMOM, SSALB, TAUC, TAUCPR, UTAU,
      &             UTAUPR, UMU, UMU0, USRTAU, USRANG )
-
 c                                 ** Print input information
       IF( PRNT( 1 ) )
      &    CALL PRTINP( NLYR, DTAUC, DTAUCP, SSALB, NMOM, PMOM, TEMPER,
@@ -567,8 +566,8 @@ c                              ** beam angles at once
      &                WK, YLMC, YLMU, Z, WKD, MI, MI9M2, MAXUMU, MXCMU,
      &                MXUMU, NNLYRI, SQT, ALBMED, TRNMED )
          RETURN
-
       END IF
+
 c                                   ** Calculate Planck functions
       IF( .NOT.PLANK ) THEN
 
@@ -587,7 +586,6 @@ c                                   ** Calculate Planck functions
 
       END IF
 
-
 c ========  BEGIN LOOP TO SUM AZIMUTHAL COMPONENTS OF INTENSITY  =======
 c           (EQ STWJ 5, STWL 6)
 
@@ -602,9 +600,7 @@ c                                    ** Azimuth-independent case
      &     ABS(1.-UMU(2)).LT.1.E-5 ) )
      &   NAZ = 0
 
-
       DO 180 MAZIM = 0, NAZ
-
          IF( MAZIM.EQ.0 ) DELM0  = 1.0
          IF( MAZIM.GT.0 ) DELM0  = 0.0
 
@@ -654,14 +650,12 @@ c                                 ** and emissivity properties
 c ===================  BEGIN LOOP ON COMPUTATIONAL LAYERS  =============
 
          DO 80 LC = 1, NCUT
-
 c                      ** Solve eigenfunction problem in Eq. STWJ(8B),
 c                      ** STWL(23f); return eigenvalues and eigenvectors
 
             CALL SOLEIG( AMB, APB, ARRAY, CMU, CWT, GL( 0,LC ), MI,
      &                   MAZIM, MXCMU, NN, NSTR, YLMC, CC, EVECC, EVAL,
      &                   KK( 1,LC ), GC( 1,1,LC ), WKD )
-
 c                                  ** Calculate particular solutions of
 c                                  ** Eq. SS(18), STWL(24a) for incident
 c                                  ** beam source
@@ -688,7 +682,6 @@ c
      &                      Z0, Z1, ZPLK0( 1,LC ), ZPLK1( 1,LC ) )
             END IF
 
-
             IF( .NOT.ONLYFL .AND. USRANG ) THEN
 
 c                                            ** Interpolate eigenvectors
@@ -709,20 +702,17 @@ c                                            ** to user angles
             END IF
 
    80    CONTINUE
-
 c ===================  END LOOP ON COMPUTATIONAL LAYERS  ===============
 
 
 c                      ** Set coefficient matrix of equations combining
 c                      ** boundary and layer interface conditions
-
          CALL SETMTX( BDR, CBAND, CMU, CWT, DELM0, DTAUCP, GC, KK,
      &                LAMBER, LYRCUT, MI, MI9M2, MXCMU, NCOL, NCUT,
      &                NNLYRI, NN, NSTR, TAUCPR, WK )
 
 c                      ** Solve for constants of integration in homo-
 c                      ** geneous solution (general boundary conditions)
-
          CALL SOLVE0( B, BDR, BEM, BPLANK, CBAND, CMU, CWT, EXPBEA,
      &                FBEAM, FISOT, IPVT, LAMBER, LL, LYRCUT, MAZIM, MI,
      &                MI9M2, MXCMU, NCOL, NCUT, NN, NSTR, NNLYRI, PI,
@@ -735,8 +725,8 @@ c                                  ** Compute upward and downward fluxes
      &                    MAXULV, MXCMU, MXULV, NCUT, NN, NSTR, NTAU,
      &                    PI, PRNT, PRNTU0( 1 ), SSALB, TAUCPR, UMU0,
      &                    UTAU, UTAUPR, XR0, XR1, ZZ, ZPLK0, ZPLK1,
-     &                    sccomb, DFDT, FLUP, FLDN, FLDIR, RFLDIR, 
-     &                    RFLDN, dirscale,UAVG,U0C )
+     &          sccomb, DFDT, FLUP,FLUP_act, FLDN, FLDN_act, FLDIR,
+     &                    RFLDIR, RFLDN, dirscale, UAVG, U0C )
 
          IF( ONLYFL ) THEN
 
@@ -877,7 +867,8 @@ c                                    ** correct answers and abort if bad
      &                PMOM( 0,1 ), PRNT, PRNTU0, SSALB( 1 ), TEMIS,
      &                TEMPER( 0 ), TTEMP, UMU( 1 ), USRANG, USRTAU,
      &                UTAU( 1 ), UMU0, WVNMHI, WVNMLO, COMPAR,
-     &                FLUP( 1 ), RFLDIR( 1 ), RFLDN( 1 ), UU( 1,1,1 ) )
+     &                FLUP( 1 ),
+     &                RFLDIR( 1 ), RFLDN( 1 ), UU( 1,1,1 ) )
 
          PASS1  = .FALSE.
          GO TO 20
@@ -973,7 +964,7 @@ c     ..
 c     .. External Functions ..
 
       REAL      D1MACH
-      EXTERNAL  D1MACH
+c      EXTERNAL  D1MACH
 c     ..
 c     .. External Subroutines ..
 
@@ -986,13 +977,10 @@ c     ..
       DATA      C1 / 0.4375 / , C2 / 0.5 / , C3 / 0.75 / , C4 / 0.95 / ,
      &          C5 / 16.0 / , C6 / 256.0 / , ZERO / 0.0 / , ONE / 1.0 /
 
-
       IER  = 0
       TOL  = D1MACH( 4 )
-
       IF( M.LT.1 .OR. IA.LT.M .OR. IEVEC.LT.M )
      &    CALL ERRMSG( 'ASYMTX--bad input variable(s)', .TRUE. )
-
 
 c                           ** Handle 1x1 and 2x2 special cases
       IF( M.EQ.1 ) THEN
@@ -1002,9 +990,7 @@ c                           ** Handle 1x1 and 2x2 special cases
          RETURN
 
       ELSE IF( M.EQ.2 ) THEN
-
          DISCRI = ( AA( 1,1 ) - AA( 2,2 ) )**2 + 4.*AA( 1,2 )*AA( 2,1 )
-
          IF( DISCRI .LT. ZERO )
      &       CALL ERRMSG( 'ASYMTX--complex evals in 2x2 case',.TRUE. )
 
@@ -1036,7 +1022,6 @@ c                           ** Handle 1x1 and 2x2 special cases
          RETURN
 
       END IF
-
 c                                        ** Initialize output variables
       IER  = 0
 
@@ -1795,7 +1780,7 @@ c                                       ** Loop over user levels
      &                   PI, PRNT, PRNTU0, SSALB, TAUCPR, UMU0, UTAU,
      &                   UTAUPR, XR0, XR1, ZZ, ZPLK0, ZPLK1, sccomb,
      &                   DFDT,
-     &                   FLUP, FLDN, FLDIR, RFLDIR, RFLDN, 
+     &         FLUP, FLUP_act, FLDN, FLDN_act, FLDIR, RFLDIR, RFLDN, 
      &                   gcosres_ang0, UAVG, U0C )
 
 c       Calculates the radiative fluxes, mean intensity, and flux
@@ -1885,7 +1870,8 @@ c     .. Array Arguments ..
       LOGICAL   PRNT( * ), sccomb
       INTEGER   LAYRU( MXULV )
       REAL      CMU( MXCMU ), CWT( MXCMU ), DFDT( MAXULV ),
-     &          FLDIR( MXULV ), FLDN( MXULV ), FLUP( MAXULV ),
+     &          FLDIR( MaXULV ), FLDN( MaXULV ), FLDN_act( MaXULV ), 
+     &          FLUP( MAXULV ), FLUP_act( MAXULV ),
      &          GC( MXCMU, MXCMU, * ), KK( MXCMU, * ), LL( MXCMU, * ),
      &          RFLDIR( MAXULV ), RFLDN( MAXULV ), SSALB( * ),
      &          TAUCPR( 0:* ), U0C( MXCMU, MXULV ), UAVG( MAXULV ),
@@ -1895,7 +1881,8 @@ c     ..
 c     .. Local Scalars ..
 
       INTEGER   IQ, JQ, LU, LYU
-      REAL      ANG1, ANG2, DIRINT, FACT, FDNTOT, FNET, PLSORC, ZINT
+      REAL      ANG1, ANG2, DIRINT, FACT, FDNTOT, FNET,
+     &          PLSORC, ZINT
       real      gcosres(mxcmu)
 c     ..
 c     .. External Subroutines ..
@@ -1906,7 +1893,6 @@ c     .. Intrinsic Functions ..
 
       INTRINSIC acos,EXP
 c     ..
-
 
       IF( PRNT( 2 ) ) WRITE ( *, '(//,21X,A,/,2A,/,2A,/)' )
      &    '<----------------------- FLUXES ----------------------->',
@@ -1923,6 +1909,7 @@ c                                        ** Zero DISORT output arrays
       CALL ZEROIT( U0C, MXULV*MXCMU )
       CALL ZEROIT( FLDIR, MXULV )
       CALL ZEROIT( FLDN, MXULV )
+      CALL ZEROIT( FLDN_act, MXULV)
 
 c                                        ** Loop over user levels
       DO 80 LU = 1, NTAU
@@ -1986,6 +1973,9 @@ c                                                ** this level
      &              U0C( IQ, LU )
                FLDN( LU ) = FLDN( LU ) + CWT( NN + 1 - IQ )*
      &              CMU( NN + 1 - IQ )*U0C( IQ, LU )
+               FLDN_act( LU ) = FLDN_act( LU ) + CWT( NN + 1 - IQ )*
+     &              U0C( IQ, LU )
+
             endif
    30    CONTINUE
 
@@ -2020,6 +2010,8 @@ c                                                ** this level
                UAVG( LU ) = UAVG( LU ) + CWT( IQ - NN )*U0C( IQ, LU )
                FLUP( LU ) = FLUP( LU ) + CWT( IQ - NN )*CMU( IQ - NN )*
      &                   U0C( IQ, LU )
+               FLUP_act( LU ) = FLUP_act( LU ) + CWT( IQ - NN )*
+     &                   U0C( IQ, LU )
             endif
    60    CONTINUE
 
@@ -2028,7 +2020,9 @@ c                                                ** this level
             rfldir(lu) = gcosres_ang0 * rfldir(lu)
          endif
          FLUP( LU )  = 2.*PI*FLUP( LU )
+         FLUP_act( LU ) = 2.*PI*FLUP_act( LU )
          FLDN( LU )  = 2.*PI*FLDN( LU )
+         FLDN_act( LU ) = 2.*PI*FLDN_act( LU )
          FDNTOT      = FLDN( LU ) + FLDIR( LU )
          FNET        = FDNTOT - FLUP( LU )
          RFLDN( LU ) = FDNTOT - RFLDIR( LU )
@@ -3368,7 +3362,6 @@ c                      ** Find (real) eigenvalues and eigenvectors
          CALL ERRMSG( 'ASYMTX--convergence problems',.True.)
 
       END IF
-
 
       DO 80 IQ = 1, NN
          EVAL( IQ )    = SQRT( ABS( EVAL( IQ ) ) )
@@ -5224,6 +5217,8 @@ c                    ** angles does not assume unphysical values
       NUMSQT = 2*MAX( 100, NSTR )
       IF( MXSQT.LT.NUMSQT ) INPERR = WRTDIM( 'MXSQT', NUMSQT )
 
+
+
       IF( INPERR )
      &    CALL ERRMSG( 'DISORT--input and/or dimension errors', .True. )
 
@@ -5578,6 +5573,7 @@ c     ..
 c     .. External Functions ..
 
       REAL      D1MACH
+c      double precision d1mach
       EXTERNAL  D1MACH
 c     ..
 c     .. External Subroutines ..
@@ -5601,23 +5597,16 @@ c     ..
 c     .. Statement Function definitions ..
 
       PLKF( X ) = X**3 / ( EXP( X ) - 1 )
-c     ..
-
-
       IF( PI .EQ. 0.0 ) THEN
-
          PI     = 2.*ASIN( 1.0 )
          VMAX   = LOG( D1MACH( 2 ) )
          EPSIL  = D1MACH( 4 )
          SIGDPI = SIGMA / PI
          CONC   = 15. / PI**4
-
       END IF
-
 
       IF( T.LT.0.0 .OR. WNUMHI.LE.WNUMLO .OR. WNUMLO.LT.0. )
      &    CALL ERRMSG('PLKAVG--temperature or wavenums. wrong',.TRUE.)
-
 
       IF( T .LT. 1.E-4 ) THEN
 
@@ -5629,6 +5618,8 @@ c     ..
 
       V( 1 ) = C2*WNUMLO / T
       V( 2 ) = C2*WNUMHI / T
+c      V( 1 ) = C2*WLO / T
+c      V( 2 ) = C2*WHI / T
 
       IF( V( 1 ).GT.EPSIL .AND. V( 2 ).LT.VMAX .AND.
      &    ( WNUMHI - WNUMLO ) / WNUMHI .LT. 1.E-2 ) THEN
@@ -6318,7 +6309,8 @@ c                      ** from A*B because A*B may (over/under)flow
      &                   NUMU, NSTR, NTAU, ONLYFL, PHI, PHI0, NMOM,
      &                   PMOM, PRNT, PRNTU0, SSALB, TEMIS, TEMPER,
      &                   TTEMP, UMU, USRANG, USRTAU, UTAU, UMU0, WVNMHI,
-     &                   WVNMLO, COMPAR, FLUP, RFLDIR, RFLDN, UU )
+     &                   WVNMLO, COMPAR, FLUP, RFLDIR, RFLDN,
+     &                   UU )
 
 c       If  COMPAR = FALSE, save user input values that would otherwise
 c       be destroyed and replace them with input values for self-test.
@@ -6347,7 +6339,8 @@ c     .. Scalar Arguments ..
       LOGICAL   COMPAR, CORINT, DELTAM, LAMBER, ONLYFL, PLANK, USRANG,
      &          USRTAU
       INTEGER   IBCND, NLYR, NMOM, NPHI, NSTR, NTAU, NUMU
-      REAL      ACCUR, ALBEDO, BTEMP, DTAUC, FBEAM, FISOT, FLUP, PHI,
+      REAL      ACCUR, ALBEDO, BTEMP, DTAUC, FBEAM, FISOT, FLUP, 
+     &          PHI,
      &          PHI0, RFLDIR, RFLDN, SSALB, TEMIS, TTEMP, UMU, UMU0,
      &          UTAU, UU, WVNMHI, WVNMLO
 c     ..
@@ -6573,8 +6566,8 @@ c                                      ** Restore user input values
      &                   ND13, EVAL,
      &                   ND14, AMB, APB,
      &                   ND15, IPVT, Z,
-     &                   ND16, RFLDIR, RFLDN, FLUP, UAVG, DFDT,
-     &                         fldir,fldn,
+     &                   ND16, RFLDIR, RFLDN, FLUP, flup_act,
+     &                         UAVG, DFDT,fldir,fldn, fldn_act,
      &                   ND17, ALBMED, TRNMED,
      &                   ND18, U0U,
      &                   ND19, UU , umu0)
@@ -6603,7 +6596,7 @@ c     .. Array Arguments ..
      &          XR0( * ), XR1( * ), YLM0( * ), YLMC( * ), Z( * ),
      &          Z0( * ), Z0U( * ), Z1( * ), Z1U( * ), YLMU( * ),
      &          ZBEAM( * ), ZJ( * ), ZPLK0( * ), ZPLK1( * ), ZZ( * ),
-     &          fldir(*),fldn(*)
+     &          fldir(*),fldn(*),flup_act(*),fldn_act(*)
 c     ..
 c     .. Local Scalars ..
 
@@ -6701,10 +6694,12 @@ c     ..
          RFLDIR( N ) = 0.
          RFLDN( N )  = 0.
          FLUP( N )   = 0.
+         flup_act(n) = 0.
          UAVG( N )   = 0.
          DFDT( N )   = 0.
          fldir( n )  = 0.
          fldn( n )   = 0.
+         fldn_act(n) = 0.
   160 CONTINUE
 
       DO 170 N = 1, ND17

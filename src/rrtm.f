@@ -79,7 +79,8 @@ C        level and the heating rate for each layer
      &                   DIFDOWNFLUX(0:MXLAY,0:nbands), 
      &                   DIRDOWNFLUX(0:MXLAY,0:nbands),
      &                   FNET(0:MXLAY,0:nbands), 
-     &                   HTR(0:MXLAY,0:nbands) 
+     &                   HTR(0:MXLAY,0:nbands),
+     &                   FNET_act(0:MXLAY,0:nbands)
 
 
       COMMON /CVRRTM/    HNAMRTM,HVRRTM
@@ -130,19 +131,20 @@ C        level and the heating rate for each layer
 
       CHARACTER PAGE
 
-      CHARACTER*50 OUTFORM(7)
+      CHARACTER*54 OUTFORM(8)
 
 
 c     Setup format statements for output
 
       DATA OUTFORM 
-     1/'(1X,I3,3X,F7.6,4X,4(F10.4,4X),F11.6,4X,F10.5)',
-     2 '(1X,I3,4X,F6.5,4X,4(F10.4,4X),F11.6,4X,F10.5)',
-     3 '(1X,I3,4X,F6.4,4X,4(F10.4,4X),F11.6,4X,F10.5)',
-     4 '(1X,I3,4X,F6.3,4X,4(F10.4,4X),F11.6,4X,F10.5)',
-     5 '(1X,I3,4X,F6.2,4X,4(F10.4,4X),F11.6,4X,F10.5)',
-     6 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F11.6,4X,F10.5)',
-     7 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F11.6,4X,F10.5)'/
+     1/'(1X,I3,3X,F7.6,4X,4(F10.4,4X),F11.6,4X,F10.4,4x,F11.6)',
+     2 '(1X,I3,4X,F6.5,4X,4(F10.4,4X),F11.6,4X,F10.4,4x,F11.6)',
+     3 '(1X,I3,4X,F6.4,4X,4(F10.4,4X),F11.6,4X,F10.4,4x,F11.6)',
+     4 '(1X,I3,4X,F6.3,4X,4(F10.4,4X),F11.6,4X,F10.4,4x,F11.6)',
+     5 '(1X,I3,4X,F6.2,4X,4(F10.4,4X),F11.6,4X,F10.4,4x,F11.6)',
+     6 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F11.6,4X,F10.4,4x,F11.6)',
+     7 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F11.6,4X,F10.4,4x,F11.6)',
+     8 '(1X,I3,4X,F6.1,4X,4(F10.4,4X),F11.6,4X,F10.4,4x,F11.6)'/
 
       PAGE = CHAR(12)
 
@@ -185,7 +187,7 @@ C        by interpolating data from stored reference atmospheres.
          CALL SETCOEF
 
 C ***    Call the radiative transfer routine.
-         CALL RTRDIS
+         CALL RTRDIS_dg
 
          IF (IOUT .LT. 0) GO TO 4000
 
@@ -238,10 +240,12 @@ C
             ELSE
                INDFORM = 7
             ENDIF
+            
             WRITE(IWR,OUTFORM(INDFORM)) I, PZ(I), 
      &           TOTUFLUX(I,IPBAND), DIFDOWNFLUX(I,IPBAND), 
      &           DIRDOWNFLUX(I,IPBAND), TOTDFLUX(I,IPBAND), 
-     &           FNET(I,IPBAND), HTR(I,IPBAND)
+     &           FNET(I,IPBAND),HTR(I,IPBAND),
+     &           FNET_act(I,IPBAND)
  3000    CONTINUE
          WRITE(IWR,9903)PAGE
  3001    CONTINUE
@@ -290,9 +294,9 @@ C ***    Output module version numbers
 
  9899 FORMAT(1X,'Wavenumbers: ',F6.0,' - ',F6.0,' cm-1')
  9900 FORMAT(1X,'LEVEL PRESSURE   UPWARD FLUX   DIFDOWN FLUX  DIRDOWN FL  
-     &UX  DOWNWARD FLUX   NET FLUX    HEATING RATE')
+     &UX  DOWNWARD FLUX   NET FLUX    HEATING RATE    ACTINIC FLUX')
  9901 FORMAT(1X,'         mb          W/m2          W/m2          W/m2
-     &        W/m2          W/m2       degree/day')
+     &        W/m2          W/m2       degree/day         W/m2')
  9902 FORMAT(1X,I3,3X,F11.6,4X,1P,2(G12.6,2X),G13.6,3X,G16.9,0P)
  9903 FORMAT(A)
  9910 FORMAT('  Modules and versions used in this calculation:',/,/,
@@ -924,18 +928,18 @@ c   use Iqbal's equation 1.2.1
      *     HVRCLD / 'NOT USED' /,
      *     HVRDIS / 'NOT USED' / 
  
-      DATA HNAMRTM / '           rrtm.f:' /,
+      DATA HNAMRTM / '        rrtm_dg.f:' /,
      *     HNAMSET / '        setcoef.f:' /,
      *     HNAMATM / '         rrtatm.f:' /,
      *     HNAMUTL / '       util_xxx.f:' /,
      *     HNAMTAU / '      taumoldis.f:' /,
      *     HNAMCLD / '        cldprop.f:' /,
      *     HNAMEXT / '          extra.f:' /,
-     *     HNAMRTR / '         rtrdis.f:' /,
+     *     HNAMRTR / '      rtrdis_dg.f:' /,
      *     HNAMRDI / '       RDI1MACH.f:' /,
      *     HNAMERR / '        ErrPack.f:' /,
      *     HNAMLPK / '         LINPAK.f:' /,
-     *     HNAMDIS / '         disort.f:' /
+     *     HNAMDIS / '      disort_dg.f:' /
 
       DATA HVRKG26 / ' ' /
       DATA HNAMKG26 / ' '/

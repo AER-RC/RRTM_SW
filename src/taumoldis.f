@@ -1710,7 +1710,8 @@ C  Input
       COMMON /PROFDATA/ LAYTROP,LAYSWTCH,LAYLOW,
      &                  COLH2O(MXLAY),COLCO2(MXLAY),
      &                  COLO3(MXLAY),COLN2O(MXLAY),COLCH4(MXLAY),
-     &                  COLO2(MXLAY),CO2MULT(MXLAY)
+     &                  COLO2(MXLAY),CO2MULT(MXLAY),
+     &                  COLSO2(MXLAY)
       COMMON /INTFAC/   FAC00(MXLAY),FAC01(MXLAY),                            
      &                  FAC10(MXLAY),FAC11(MXLAY)                             
       COMMON /INTIND/   JP(MXLAY),JT(MXLAY),JT1(MXLAY)
@@ -1724,13 +1725,21 @@ C  Input
 
 
       DIMENSION ABSA(65,MG), ABSB(235,MG), SFLUXREF(MG)
-      DIMENSION RAYL(MG)
+      DIMENSION RAYL(MG),ABSSO2B(MG)
 
       DATA RAYL/
      &     3.44534E-06,4.14480E-06,4.95069E-06,5.81204E-06,
      &     6.69748E-06,7.56488E-06,8.36344E-06,9.04135E-06,
      &     9.58324E-06,9.81542E-06,9.75119E-06,9.74533E-06,
      &     9.74139E-06,9.73525E-06,9.73577E-06,9.73618E-06/
+
+ 
+      DATA ABSSO2B/
+     &   0.79707E-01,0.35004E+01,0.25205E+02,0.62669E+02,
+     &   0.79983E+02,0.75561E+02,0.60779E+02,0.46965E+02,
+     &   0.38687E+02,0.31295E+02,0.31104E+02,0.24393E+02,
+     &   0.28655E+02,0.30150E+02,0.30178E+02,0.30239E+02/
+
       DATA SFLUXREF/
 C     The following values were obtained using the "low resolution"
 C     version of the Kurucz solar source function.  For unknown reasons,
@@ -1769,6 +1778,7 @@ C     vapor self-continuum is interpolated (in temperature) separately.
  2500 CONTINUE
 
       LAYSOLFR = NLAYERS
+
       DO 3500 LAY = LAYTROP+1, NLAYERS
          IF (JP(LAY-1) .LT. LAYREFFR .AND. JP(LAY) .GE. LAYREFFR) 
      &        LAYSOLFR = LAY
@@ -1781,6 +1791,7 @@ C     vapor self-continuum is interpolated (in temperature) separately.
      &           FAC10(LAY) * ABSB(IND0+1,IG) +
      &           FAC01(LAY) * ABSB(IND1,IG) + 
      &           FAC11(LAY) * ABSB(IND1+1,IG)) +
+     &           COLSO2(LAY) * ABSSO2B(IG) +
      &           TAURAY
             SSA(LAY,IG) = TAURAY/TAUG(LAY,IG)
             IF (LAY.EQ.LAYSOLFR) SFLUXZEN(IG) = SCALEKUR * SFLUXREF(IG) 
