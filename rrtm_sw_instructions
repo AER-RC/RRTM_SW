@@ -491,7 +491,7 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
  16        2600-3250                     H2O,CH4             CH4
  17        3250-4000                     H2O,CO2           H2O,CO2
  18        4000-4650                     H2O,CH4             CH4
- 18        4650-5150                     H2O,CO2             CO2
+ 19        4650-5150                     H2O,CO2             CO2
  20        5150-6150                     H2O,CH4*          H2O,CH4*
  21        6150-7700                     H2O,CO2           H2O,CO2
  22        7700-8050                     H2O,O2              O2
@@ -739,11 +739,11 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
              = 1     spectrally dependent SSA (for band IB, equal to SSA(IB))
  
       IPHA  (0,1,2)  phase function flag 
-             = 0     spectrally gray phase function (equal to PHASE(16) in first and only Record 2.3); uses 
+             = 0     spectrally gray phase function (equal to PHASE(16) in first and only Record A2.3); uses 
                      Henyey-Greenstein phase function
              = 1     spectrally dependent phase function (for band IB, equal to PHASE(IB) in first and only
-                     Record 2.3); uses Henyey-Greenstein phase function
-             = 2     direct specification of moments of phase function.  See Record 2.3.
+                     Record A2.3); uses Henyey-Greenstein phase function
+             = 2     direct specification of moments of phase function.  See Record A2.3.
 	     
       AERPAR  (only used if IAOD = 0) array of parameters for obtaining aerosol optical depth as a 
               function of wavelength, as described below:
@@ -793,7 +793,7 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
                        altitudes n and n+1 in the list of layer boundaries in Record 3.3B.  
                        For IATM = 1 (Record 1.2) and IBMAX = 0 (Record 3.1), the layer 
                        numbers can be determined by running RRTM for the cloudless case
-                       and examining the TAPE6 output from this run.(
+                       and examining the TAPE6 output from this run.
 
    (if IAOD = 0)
             AOD1       aerosol optical depth at 1 micron; can be used to scale the amount of aerosols in the
@@ -816,7 +816,7 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
 
         SSA   Single scattering albedo for each band; must be equal to or greater than zero and 
               less than or equal to 1.  If ISSA equals 0, then only the first value of SSA (SSA(16))
-              is considered.
+              is considered. There should only be one Record A2.2 for each aerosol type.
 
  RECORD A2.3  
 	
@@ -826,13 +826,18 @@ Band #   Wavenumber Range (cm-1)       1050 - 96 mb      96 - 0.01 mb
 
                     14F5.2
 
-        PHASE   Moments (starting with first moment) of the phase function for band IB.  In this implementation, 
-                the phase function P(u) for each band is defined as 
+        PHASE   Moments of the phase function for all IB bands.  Each record A2.3 (1 through N, where N is the
+                number of streams) contains the nth moment for each band. In this implementation, the phase 
+                function P(u) for each band is defined as: 
+
                      P(u) = sum over streams l { (2l+1) (PHASE_l) (P_l(u)) }
+
                 where
+
                      u = cos(theta)
                      PHASE_l = the lth moment of the phase function
                      P_l(u) = lth Legendre polynomial,
+
                 and the number of streams to be used in DISORT (using the delta-M method) is determined 
                 by the value of ISTRM in Record 1.2 of INPUT_RRTM.
 
