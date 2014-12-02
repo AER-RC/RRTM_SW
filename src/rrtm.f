@@ -756,12 +756,10 @@ c        For this aerosol, read and store optical properties
                enddo
  3000       CONTINUE
          else
-            do il = 1, nlay
-               do istr = 1, nstr
-                  read (irdaer, 9013) (phase(istr,lay(il),ib), 
+	    do istr = 1, nstr
+	       read (irdaer, 9013) (phase(istr,lay(il),ib), 
      &                 ib = ib1,ib2)
-               enddo
-            enddo
+	    enddo
          endif
 
       enddo    ! end of naer loop
