@@ -633,7 +633,7 @@ C               aerosol properties.
      &                   PZ(0:MXLAY),TZ(0:MXLAY),TBOUND
       COMMON /SWPROP/    ZENITH, ALBEDO, ADJFLUX(NBANDS)
       common /AERDAT/    ssaaer(mxlay,nbands), phase(mcmu,mxlay,nbands), 
-     &                   tauaer(mxlay,nbands)
+     &                   tauaer(mxlay,nbands), phase_in(mcmu,nbands)
       CHARACTER*1 CTEST, CPERCENT
 
       DATA CPERCENT /'%'/
@@ -752,10 +752,13 @@ c        For this aerosol, read and store optical properties
                enddo
  3000       CONTINUE
          else
+	    do istr = 1, nstr
+	       read (irdaer, 9013) (phase_in(istr,ib), 
+     &                 ib = ib1,ib2)
+	    enddo
             do il = 1, nlay
                do istr = 1, nstr
-                  read (irdaer, 9013) (phase(istr,lay(il),ib), 
-     &                 ib = ib1,ib2)
+                  phase(istr,lay(il),ib) = phase_in(istr,ib)
                enddo
             enddo
          endif
