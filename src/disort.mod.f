@@ -361,7 +361,7 @@ c     .. Parameters ..
 
       INTEGER   MXCLY, MXULV, MXCMU, MXUMU, MXPHI, MI, MI9M2, NNLYRI,
      &          MXSQT
-      PARAMETER ( MXCLY = 400, MXULV = 400, MXCMU = 32, MXUMU = 32,
+      PARAMETER ( MXCLY = 200, MXULV = 200, MXCMU = 32, MXUMU = 32,
      &          MXPHI = 3, MI = MXCMU / 2, MI9M2 = 9*MI - 2,
      &          NNLYRI = MXCMU*MXCLY, MXSQT = 1000 )
 
@@ -6111,7 +6111,7 @@ c     .. Intrinsic Functions ..
 c     ..
       SAVE      PI, TOL
 
-      DATA      PI / 0.0 /, MAXIT / 1000 /, ONE / 1.0 /, TWO / 2.0 /
+      DATA      PI / 0.0 /, MAXIT / 2000 /, ONE / 1.0 /, TWO / 2.0 /
 
 
       IF( PI.EQ.0.0 ) THEN
@@ -6168,6 +6168,7 @@ c                                              ** Newton Method
 c                                              ** Check for convergence
          IF( ABS( XI - X ).GT.TOL ) THEN
 
+            print *,'iter ',iter
             IF( ITER.GT.MAXIT )
      &          CALL ERRMSG( 'QGAUSN--max iteration count',.True.)
 

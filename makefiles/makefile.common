@@ -14,7 +14,7 @@
 FC_TYPE = gnu
 
 #Set version Name
-VERSION = v2.7.2
+VERSION = v2.7.3
 
 # Set name of RRTM executable
 OUTPUT = rrtm_sw_$(VERSION)_$(PLTFRM)_$(FC)
